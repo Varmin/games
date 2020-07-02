@@ -1,0 +1,5 @@
+include ':app:ModuleGame'
+include ':app:ModuleLogin'
+include ':app:ModuleBase'
+include ':app'
+rootProject.name = "AtoshiGames"
