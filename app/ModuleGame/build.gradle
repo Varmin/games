@@ -4,6 +4,7 @@ if (IS_APPLICATION) {
     apply plugin: 'com.android.library'
 }
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 android {
@@ -53,4 +54,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     api project(":app:ModuleBase")
+
+    kapt 'com.jakewharton:butterknife-compiler:10.2.1'//annotationProcessor
 }

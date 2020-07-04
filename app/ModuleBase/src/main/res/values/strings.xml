@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">ModuleLogin</string>
 
-
-
     <string name="please_input_account">请输入手机号/邮箱账号</string>
     <string name="please_input_name">请输入昵称</string>
     <string name="please_input_figure_code">请输入图形验证码</string>
