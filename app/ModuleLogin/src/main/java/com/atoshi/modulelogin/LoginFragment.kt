@@ -22,7 +22,7 @@ class LoginFragment : Fragment() {
             param2 = it.getString(ARG_PARAM2)
         }
 
-        // TODO: by HY, 2020/7/13
+        // TODO: by HY, 2020/7/13 delete
         WXUtils.registerApp(activity as Context)
     }
 

@@ -12,6 +12,8 @@ import com.tencent.mm.opensdk.openapi.WXAPIFactory
  */
 private const val WX_APP_ID = "wx02027c5ed55b1219"
 private const val WX_SECRET = ""
+private const val WX_REQ_SCOPE = "snsapi_userinfo"
+private const val WX_REQ_STATE = "wechat_sdk_demo_test"
 
 class WXUtils {
     private constructor()
@@ -33,12 +35,16 @@ class WXUtils {
             if (mWxApi.isWXAppInstalled) {
                 //Toast.makeText(mContext, "请稍后...", Toast.LENGTH_SHORT).show()
                 mWxApi.sendReq(SendAuth.Req().apply {
-                    scope = "snsapi_userinfo"
-                    state = "wechat_sdk_demo_test"
-                })
+                    scope = WX_REQ_SCOPE
+                    state = WX_REQ_STATE
+                }).let {
+                    println("WxUtils.login: $it")
+                }
             }else{
                 Toast.makeText(mContext, "您还未安装微信客户端！", Toast.LENGTH_LONG).show()
             }
         }
+
+        fun getWXApi():IWXAPI = mWxApi
     }
 }
