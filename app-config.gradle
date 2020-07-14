@@ -1,3 +1,41 @@
 ext{
     IS_APPLICATION = false
+
+    configAndroid = [
+            versionCode : 100,
+            versionName : "1.0.0",
+            minSdkVersion    : 21,
+            targetSdkVersion : 28,
+            compileSdkVersion : 28,
+            buildToolsVersion: "28.0.3",
+    ]
+
+    _ver = [
+            retrofit     : "2.9.0",
+            rxjava       : "3.0.0",
+            butterKnife  : "10.2.1",
+    ]
+    configDependencies = [
+            // ButterKnife、Kotlin使用apt插件，并且每个用到的module都要在gradle中配置
+            butterKnife             : "com.jakewharton:butterknife:${_ver.butterKnife}",
+            butterKnife_compiler    : "com.jakewharton:butterknife-compiler:${_ver.butterKnife}",
+
+            // Retrofit
+            retrofit                : "com.squareup.retrofit2:retrofit:${_ver.retrofit}",
+            retrofit_adapter        : "com.squareup.retrofit2:adapter-rxjava3:${_ver.retrofit}",
+            retrofit_gson           : "com.squareup.retrofit2:converter-gson:${_ver.retrofit}",
+            retrofit_manager        : "me.jessyan:retrofit-url-manager:1.4.0",
+            okhttp_logging          : "com.squareup.okhttp3:logging-interceptor:4.8.0",
+
+            // RxJava3、RxAndroid
+            rxjava                  : "io.reactivex.rxjava3:rxjava:${_ver.rxjava}",
+            rxandroid               : "io.reactivex.rxjava3:rxandroid:${_ver.rxjava}",
+
+            // 腾讯
+            tencent_wx_dev          : "com.tencent.mm.opensdk:wechat-sdk-android-without-mta:6.6.4",
+            tencent_tbs             : "com.tencent.tbs.tbssdk:sdk:43903",
+
+    ]
+
+
 }
