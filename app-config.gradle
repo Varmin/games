@@ -35,6 +35,9 @@ ext{
             tencent_wx_dev          : "com.tencent.mm.opensdk:wechat-sdk-android-without-mta:6.6.4",
             tencent_tbs             : "com.tencent.tbs.tbssdk:sdk:43903",
 
+            cymChadAdapter          : "com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4",
+
+
     ]
 
 

@@ -3,7 +3,8 @@
     package="com.atoshi.modulelogin">
 
     <application>
-        <activity android:name=".MainActivityLogin"/>
+        <activity android:name=".MainActivityLogin"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -1,4 +1,5 @@
 ## TODO
+* 资源文件压缩
 * API动态更换url
 * ApiService返回值：Call可以手动控制异步、Observable在哪控制的？
 ```

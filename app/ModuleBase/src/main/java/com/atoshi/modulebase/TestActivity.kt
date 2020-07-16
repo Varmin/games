@@ -1,6 +1,7 @@
 package com.atoshi.modulebase
 
 import android.widget.TextView
+import com.atoshi.modulebase.base.BaseActivity
 
 class TestActivity : BaseActivity() {
 

@@ -1,4 +1,4 @@
-package com.atoshi.modulebase
+package com.atoshi.modulebase.base
 
 import android.os.Bundle
 import android.view.View

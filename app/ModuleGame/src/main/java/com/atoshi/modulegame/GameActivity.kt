@@ -1,7 +1,7 @@
 package com.atoshi.modulegame
 
 import android.view.*
-import com.atoshi.modulebase.BaseActivity
+import com.atoshi.modulebase.base.BaseActivity
 import com.tencent.smtt.sdk.WebView
 import com.tencent.smtt.sdk.WebViewClient
 

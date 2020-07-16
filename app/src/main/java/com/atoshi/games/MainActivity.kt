@@ -1,16 +1,17 @@
 package com.atoshi.games
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import com.atoshi.modulebase.net.Api
+import com.atoshi.modulebase.base.BaseActivity
+import com.atoshi.modulebase.base.start
 import com.atoshi.modulelogin.MainActivityLogin
 
-class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        startActivity(Intent(this, MainActivityLogin::class.java))
+class MainActivity : BaseActivity() {
 
+    override fun getLayoutId(): Int = R.layout.activity_main
+
+    override fun initData() {
+    }
+
+    override fun initView() {
+        //start(MainActivityLogin::class.java)
     }
 }

@@ -1,8 +1,7 @@
 package com.atoshi.modulegame
 
 import android.content.Intent
-import com.atoshi.modulebase.BaseActivity
-import com.atoshi.modulebase.TestActivity
+import com.atoshi.modulebase.base.BaseActivity
 
 class MainActivityGame : BaseActivity() {
 

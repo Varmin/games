@@ -47,4 +47,5 @@ dependencies {
     api configDependencies.rxjava
     api configDependencies.rxandroid
 
+    api configDependencies.cymChadAdapter
 }
