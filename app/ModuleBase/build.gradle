@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'com.jakewharton.butterknife'
 
 
 android {
@@ -36,9 +35,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    //ButterKnife
-    api configDependencies.butterKnife
-    kapt configDependencies.butterKnife_compiler
     //微信开放平台
     api configDependencies.tencent_wx_dev
     api configDependencies.tencent_tbs

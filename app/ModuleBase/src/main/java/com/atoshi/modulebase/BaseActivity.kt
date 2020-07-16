@@ -3,8 +3,6 @@ package com.atoshi.modulebase
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import butterknife.ButterKnife
-import butterknife.Unbinder
 
 /**
  * created by HYY on 2020/7/2
@@ -12,7 +10,6 @@ import butterknife.Unbinder
  */
 abstract class BaseActivity : AppCompatActivity() {
     protected var TAG = "BaseActivity"
-    private lateinit var mUnbinder: Unbinder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         TAG = localClassName
@@ -22,7 +19,6 @@ abstract class BaseActivity : AppCompatActivity() {
         }else{
             setContentView(getLayoutId())
         }
-        mUnbinder = ButterKnife.bind(this)
         initData()
         initView()
     }
@@ -32,8 +28,4 @@ abstract class BaseActivity : AppCompatActivity() {
     abstract fun initData()
     abstract fun initView()
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mUnbinder.unbind()
-    }
 }

@@ -1,6 +1,5 @@
 package com.atoshi.modulelogin
 
-import android.widget.ImageView
 import com.atoshi.modulebase.BaseActivity
 import com.atoshi.modulebase.net.Api
 import com.atoshi.modulebase.net.model.BaseObserver
@@ -12,8 +11,6 @@ import kotlinx.android.synthetic.main.activity_main_login.*
 
 class MainActivityLogin : BaseActivity() {
 
-    // TODO: by HY, 2020/7/15 BindView、BindClick
-    private lateinit var ivWxLogin: ImageView
 
     override fun getLayoutId(): Int = R.layout.activity_main_login
 
@@ -22,9 +19,11 @@ class MainActivityLogin : BaseActivity() {
     }
     override fun initView() {
         // TODO: by HY, 2020/7/15 顶层函数
-        iv_login_wx.setOnClickListener {
+        ivLoginWx.setOnClickListener {
             WXUtils.login()
         }
+
+        tvLoginTest.text = "Kotlin"
 
         Api.service.testGet2()
             .subscribeOn(Schedulers.io())
