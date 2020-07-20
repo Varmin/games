@@ -33,7 +33,7 @@ abstract class BaseObserver<T> : Observer<BaseResp<T>>{
     }
 
 
-    abstract fun onSuccess(result: T)
+    abstract fun onSuccess(data: T)
     fun onError(errMsg: String){
         // TODO: by HY, 2020/7/14 获取Application
         println("${javaClass.simpleName}.onError: $errMsg ")

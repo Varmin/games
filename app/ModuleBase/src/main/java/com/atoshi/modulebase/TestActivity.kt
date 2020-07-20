@@ -13,5 +13,6 @@ class TestActivity : BaseActivity() {
     override fun initView() {
         var tvTest = findViewById<TextView>(R.id.tv_test)
         tvTest.text = "Kotlin"
+
     }
 }
