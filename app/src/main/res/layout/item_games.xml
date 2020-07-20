@@ -5,18 +5,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-
     <ImageView
         android:id="@+id/ivGameFrontCover"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="150dp"
+        android:layout_height="100dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:background="@tools:sample/avatars"
         tools:srcCompat="@tools:sample/avatars"
-        android:background="@color/colorAccent"
+        android:foreground="?android:attr/selectableItemBackground"
         />
 
     <TextView
@@ -34,7 +32,6 @@
         android:id="@+id/tvGameDes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         android:lines="1"
         android:maxLength="12"
         android:includeFontPadding="false"

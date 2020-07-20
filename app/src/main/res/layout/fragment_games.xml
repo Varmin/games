@@ -11,6 +11,7 @@
         android:id="@+id/_tvListTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
         android:padding="20dp"
         android:text="游戏列表"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,19 +26,26 @@
         app:layout_constraintBottom_toBottomOf="@id/_tvListTitle"
         app:layout_constraintEnd_toEndOf="parent"
         />
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvGames"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/srLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        app:spanCount="2"
-        tools:itemCount="9"
-        tools:listitem="@layout/item_games"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/_tvListTitle"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvGames"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            app:spanCount="2"
+            tools:itemCount="9"
+            tools:listitem="@layout/item_games"
+            />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
