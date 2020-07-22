@@ -34,7 +34,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
 
     private fun setFullScreen() {
-        requestWindowFeature(FEATURE_NO_TITLE);
+        requestWindowFeature(FEATURE_NO_TITLE)
 
 //        window.setFlags(
 //            WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,

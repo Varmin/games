@@ -39,8 +39,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
             app:spanCount="2"
             tools:itemCount="9"
             tools:listitem="@layout/item_games"

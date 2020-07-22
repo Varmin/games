@@ -37,15 +37,15 @@ class GamesFragment : BaseFragment() {
         }
 
         rvGames.apply {
-            addItemDecoration(SpaceItemDecoration(20))
+            addItemDecoration(SpaceItemDecoration(40))
             adapter = object : BaseQuickAdapter<GameItem, BaseViewHolder>(R.layout.item_games, data) {
                 override fun convert(holder: BaseViewHolder, item: GameItem) {
                     holder.setText(R.id.tvGameName, item.name)
                         .setText(R.id.tvGameDes, item.description)
                     Glide.with(this@GamesFragment.activity as Context)
                         .load("https://gitee.com/varmin/noteSource/raw/master/typora/2238400422.jpg")
-                        .fitCenter()
-                        .apply(RequestOptions.bitmapTransform(RoundedCorners(20)))
+                        .centerCrop()
+//                        .apply(RequestOptions.bitmapTransform(RoundedCorners(20)))
                         .into(holder.getView(R.id.ivGameFrontCover))
                 }
             }.apply {
