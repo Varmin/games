@@ -18,10 +18,10 @@ class SplashActivity : BaseActivity() {
     override fun initView() {
         window.decorView.postDelayed({
             // TODO: by HY, 2020/7/23 SP、数据库：存储位置、清除逻辑
-            //if(TextUtils.isEmpty(SPTool.getString(SPTool.WX_OPEN_ID))){
+            if(TextUtils.isEmpty(SPTool.getString(SPTool.WX_OPEN_ID))){
                 startPath("com.atoshi.modulelogin.MainActivityLogin")
-            //}
+            }
             finish()
-        }, 200)
+        }, 2000)
     }
 }

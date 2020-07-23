@@ -1,12 +1,28 @@
 package com.atoshi.modulegame
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.view.*
 import com.atoshi.modulebase.base.BaseActivity
 import com.atoshi.modulebase.base.startPath
+import com.atoshi.modulebase.utils.SPTool
 import com.tencent.smtt.sdk.WebView
 import com.tencent.smtt.sdk.WebViewClient
 
+const val ACTION_LOAD_URL = "action_load_url"
 class GameActivity : BaseActivity() {
+    // TODO: by HY, 2020/7/23 EventBus
+    private var mReceiverReload: ReceiverReload? = null
+    inner class ReceiverReload: BroadcastReceiver(){
+        override fun onReceive(context: Context?, intent: Intent?) {
+            intent?.run {
+                if(action == ACTION_LOAD_URL) loadUrl()
+            }
+        }
+    }
+
     init {
         FULL_SCREEN = true
     }
@@ -22,33 +38,21 @@ class GameActivity : BaseActivity() {
 
     override fun getLayoutId(): Int = -1
 
-    // TODO: by HY, 2020/7/23 界面初始化：卡在哪些时间了？如何检测？如果有初始化放在哪里合适？
-    /*override fun getLayoutView(): View{
-        *//*requestWindowFeature(Window.FEATURE_NO_TITLE)
-        val flag = WindowManager.LayoutParams.FLAG_FULLSCREEN
-        val window = window
-        window.setFlags(flag, flag)*//*
-        mWebView = WebView(this).apply {
-            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-            settings.javaScriptEnabled = true
-            webViewClient = object :WebViewClient(){
-                override fun shouldOverrideUrlLoading(webView: WebView?, url: String?): Boolean {
-                    println("$TAG.shouldOverrideUrlLoading: $url")
-                    webView?.loadUrl(url)
-                    return true
-                }
-            }
-          loadUrl("http://game.atoshi.mobi/shenhe?uname=123456")
-        }
-        return mWebView
-    }*/
-
     override fun initData() {
-
+        if(SPTool.getString(SPTool.WX_OPEN_ID).isNullOrEmpty()){
+            mReceiverReload = ReceiverReload().apply {
+                registerReceiver(this, IntentFilter(ACTION_LOAD_URL))
+            }
+        }
     }
 
-    override fun initView() {
+    override fun onDestroy() {
+        super.onDestroy()
+        mReceiverReload?.apply { unregisterReceiver(this) }
+    }
 
+    // TODO: by HY, 2020/7/23 界面初始化：卡在哪些时间了？如何检测？如果有初始化放在哪里合适？
+    override fun initView() {
         window.decorView.apply {
             postDelayed({
                 mWebView = WebView(this@GameActivity).apply {
@@ -67,11 +71,16 @@ class GameActivity : BaseActivity() {
                             return true
                         }
                     }
-                    loadUrl("http://game.atoshi.mobi/shenhe?uname=123456")
                 }
+                loadUrl()
                 setContentView(mWebView)
             }, 10)
         }
+    }
+
+    private fun loadUrl() {
+        var openId = SPTool.getString(SPTool.WX_OPEN_ID)
+        mWebView.loadUrl("http://game.atoshi.mobi/shenhe?uname=123456&openid=$openId")
     }
 
 

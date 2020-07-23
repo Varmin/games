@@ -10,6 +10,8 @@ import com.atoshi.modulebase.net.model.Empty
 import com.atoshi.modulebase.net.model.WxAccessToken
 import com.atoshi.modulebase.net.model.WxUserInfo
 import com.atoshi.modulebase.wx.WXUtils
+import com.atoshi.modulelogin.ACTION_WX_LOGIN
+import com.atoshi.modulelogin.MainActivityLogin
 import com.google.gson.JsonObject
 import com.tencent.mm.opensdk.constants.ConstantsAPI
 import com.tencent.mm.opensdk.modelbase.BaseReq
@@ -55,7 +57,7 @@ class WXEntryActivity : AppCompatActivity(), IWXAPIEventHandler {
                     when (it.type) {
                         ConstantsAPI.COMMAND_SENDAUTH -> {
                             Intent().apply {
-                                action = "action_wx_login"
+                                action = ACTION_WX_LOGIN
                                 putExtra("code", (resp as SendAuth.Resp).code)
                                 sendBroadcast(this)
                             }

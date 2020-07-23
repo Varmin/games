@@ -20,11 +20,11 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
+const val ACTION_WX_LOGIN = "action_wx_login"
 class MainActivityLogin : BaseActivity() {
     private lateinit var mWxLoginReceiver: WxLoginReceiver
 
     // TODO: by HY, 2020/7/23 EventBus
-    private val ACTION_WX_LOGIN = "action_wx_login"
     inner class WxLoginReceiver: BroadcastReceiver(){
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.takeIf {
@@ -74,8 +74,8 @@ class MainActivityLogin : BaseActivity() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : Observer<WxAccessToken> {
                 override fun onSubscribe(d: Disposable?) {
-                    println("${javaClass.simpleName}.onSubscribe: ")
                     loading()
+                    println("${javaClass.simpleName}.onSubscribe: ")
                 }
 
                 override fun onNext(t: WxAccessToken?) {
@@ -83,7 +83,7 @@ class MainActivityLogin : BaseActivity() {
                     t?.apply { wxLogin(this) }
                 }
 
-                override fun onComplete() {}
+                override fun onComplete() {loaded()}
                 override fun onError(e: Throwable?) {
                     println("${javaClass.simpleName}.onError: ${e.toString()} ")
                     loaded()
@@ -92,7 +92,7 @@ class MainActivityLogin : BaseActivity() {
     }
 
 
-
+    // TODO: by HY, 2020/7/23 openId限制太死，还是用token登录，改接口
     private fun wxLogin(wxAccessToken: WxAccessToken) {
         var body = HashMap<String, String>()
             .apply {
@@ -108,12 +108,17 @@ class MainActivityLogin : BaseActivity() {
                 override fun onSuccess(data: UserInfo) {
                     println("${javaClass.simpleName}.onSuccess: $data ")
                     SPTool.putString(SPTool.WX_OPEN_ID, wxAccessToken.openid)
+                    sendReloadUrl()
                     finish()
                 }
 
                 override fun onError(code: Int, errMsg: String) {
                     super.onError(code, errMsg)
-                    if(code == 4002) getUserInfo(wxAccessToken)
+                    if(code == 4002){
+                        getUserInfo(wxAccessToken)
+                    }else{
+                        loaded()
+                    }
                 }
             })
     }
@@ -143,6 +148,7 @@ class MainActivityLogin : BaseActivity() {
 
                 override fun onComplete() {
                     println("${javaClass.simpleName}.onComplete: ")
+                    loaded()
                 }
             })
     }
@@ -167,6 +173,7 @@ class MainActivityLogin : BaseActivity() {
                 override fun onSuccess(data: UserInfo) {
                     println("${javaClass.simpleName}.onSuccess: $data ")
                     SPTool.putString(SPTool.WX_OPEN_ID, info.openid)
+                    sendReloadUrl()
                     finish()
                 }
 
@@ -179,5 +186,9 @@ class MainActivityLogin : BaseActivity() {
                     loaded()
                 }
             })
+    }
+
+    private fun sendReloadUrl(){
+        sendBroadcast(Intent("action_load_url"))
     }
 }

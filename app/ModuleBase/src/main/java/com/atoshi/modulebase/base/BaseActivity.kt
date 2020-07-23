@@ -1,12 +1,16 @@
 package com.atoshi.modulebase.base
 
+import android.graphics.Color
 import android.os.Bundle
-import android.view.View
-import android.view.Window
+import android.view.*
 import android.view.Window.*
-import android.view.WindowManager
+import android.widget.FrameLayout
+import android.widget.ProgressBar
+import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.core.view.children
 
 /**
  * created by HYY on 2020/7/2
@@ -19,10 +23,11 @@ abstract class BaseActivity : AppCompatActivity(), BaseView {
     protected var FULL_SCREEN = false
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        if(FULL_SCREEN){
+        if (FULL_SCREEN) {
             window.setFlags(
                 WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+            )
         }
     }
 
@@ -31,7 +36,7 @@ abstract class BaseActivity : AppCompatActivity(), BaseView {
         super.onCreate(savedInstanceState)
         if (getLayoutView() != null) {
             setContentView(getLayoutView())
-        }else if(getLayoutId() != -1){
+        } else if (getLayoutId() != -1) {
             setContentView(getLayoutId())
         }
         initData()
@@ -46,11 +51,25 @@ abstract class BaseActivity : AppCompatActivity(), BaseView {
 
     override fun toast(toast: String) = Toast.makeText(this, toast, Toast.LENGTH_SHORT).show()
     override fun loading() {
-        toast("loading")
+        // TODO: by HY, 2020/7/23 动态加载xml自定义
+        var bar = ProgressBar(this).apply {
+            layoutParams = FrameLayout.LayoutParams(100, 100).apply {
+                gravity = Gravity.CENTER or Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL
+            }
+            tag = "loading"
+
+        }
+        findViewById<ViewGroup>(android.R.id.content).addView(bar)
     }
 
     override fun loaded() {
-        toast("loaded")
+        var content = findViewById<ViewGroup>(android.R.id.content)
+        for (view in content.children.iterator()) {
+            (view.tag as? String)?.run {
+                content.removeView(view)
+                return
+            }
+        }
     }
 
 }
