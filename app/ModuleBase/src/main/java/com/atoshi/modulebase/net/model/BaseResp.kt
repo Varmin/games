@@ -5,7 +5,7 @@ package com.atoshi.modulebase.net.model
  * description:
  */
 class BaseResp<T> {
-    public var errorCode:Int = -1
-    public var errorMsg: String = "base resp empty"
+    public var code:Int = -1
+    public var message: String = "base resp empty"
     public var data: T? = null
 }

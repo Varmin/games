@@ -10,18 +10,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".wxapi.WXEntryActivity"
-            android:theme="@style/WXEntryTheme"
+        <activity
+            android:name=".wxapi.WXEntryActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:taskAffinity="com.atoshi.games"
-            android:launchMode="singleTask"/>
+            android:theme="@style/WXEntryTheme" />
     </application>
 
 </manifest>

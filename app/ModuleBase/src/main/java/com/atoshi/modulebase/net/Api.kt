@@ -13,9 +13,9 @@ import java.util.concurrent.TimeUnit
  * description:
  */
 object Api{
+    private const val BASE_URL = "http://47.93.219.181:9599/game/gamebox/"
     val service: ApiService
     init {
-
         service = initRetrofit(initOkHttp()).create(ApiService::class.java)
     }
 
@@ -35,7 +35,7 @@ object Api{
     private fun initRetrofit(okHttpClient: OkHttpClient): Retrofit{
         return Retrofit.Builder().apply {
             client(okHttpClient)
-            baseUrl("https://wanandroid.com/")
+            baseUrl(BASE_URL)
             addCallAdapterFactory(RxJava3CallAdapterFactory.create())
             addConverterFactory(GsonConverterFactory.create())
         }.build()

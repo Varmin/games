@@ -1,8 +1,6 @@
 package com.atoshi.games
 
 import com.atoshi.modulebase.base.BaseActivity
-import com.atoshi.modulebase.base.start
-import com.atoshi.modulelogin.MainActivityLogin
 
 class MainActivity : BaseActivity() {
 
@@ -12,6 +10,5 @@ class MainActivity : BaseActivity() {
     }
 
     override fun initView() {
-        //start(MainActivityLogin::class.java)
     }
 }

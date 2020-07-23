@@ -1,15 +1,12 @@
 package com.atoshi.modulebase.net
 
-import com.atoshi.modulebase.net.model.BaseResp
-import com.atoshi.modulebase.net.model.TestBean
-import com.atoshi.modulebase.net.model.WxAccessToken
-import com.atoshi.modulebase.net.model.WxUserInfo
+import com.atoshi.modulebase.net.model.*
+import com.atoshi.modulebase.wx.WXUtils
 import io.reactivex.rxjava3.core.Observable
+import okhttp3.MediaType
+import okhttp3.RequestBody
 import retrofit2.Call
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
-import retrofit2.http.Url
+import retrofit2.http.*
 import java.util.*
 
 /**
@@ -28,6 +25,7 @@ http://www.bcsvz.com
  * description:
  */
 interface ApiService {
+
     @GET
     fun testGet(@Url url: String = "https://wanandroid.com/wxarticle/chapters/json"): Call<String>
 
@@ -37,18 +35,27 @@ interface ApiService {
         @Path("json") json: String = "json"
     ): Observable<BaseResp<List<TestBean>>>
 
+
+
+
     @GET("https://api.weixin.qq.com/sns/oauth2/access_token?grant_type=authorization_code")
     fun getAccessToken(
-        @Query("respCode") respCode: String,
-        @Query("appid") appid: String = "wx02027c5ed55b1219",
-        @Query("secret") secret: String = "c5ed55b1219"
+        @Query("code") respCode: String,
+        @Query("appid") appid: String = WXUtils.WX_APP_ID,
+        @Query("secret") secret: String = WXUtils.WX_SECRET
     ): Observable<WxAccessToken>
 
     @GET("https://api.weixin.qq.com/sns/userinfo")
     fun getUserInfo(
-        @Query("accessToken") accessToken: String,
-        @Query("openId") openId: String
+        @Query("access_token") accessToken: String,
+        @Query("openid") openId: String
     ): Observable<WxUserInfo>
 
 
+    //val body = RequestBody.create(MediaType.parse("application/json;charset=utf-8"), js.toString())
+    @POST("userLogin/register")
+    fun wxRegister(@Body body: RequestBody): Observable<String>
+
+    @POST("userLogin/wxLogin")
+    fun wxLogin(@Body body: RequestBody): Observable<BaseResp<Empty>>
 }

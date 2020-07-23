@@ -13,8 +13,9 @@ import com.tencent.mm.opensdk.openapi.WXAPIFactory
 
 
 object WXUtils {
-    private const val WX_APP_ID = "wx02027c5ed55b1219"
-    private const val WX_SECRET = ""
+    // TODO: by HY, 2020/7/22 动态赋值：gradle配置到BuildConfig？方案？
+    const val WX_APP_ID = "wxee3b1c56e518eeac"
+    const val WX_SECRET = "a4858d99ce5a4c533b7247e545a13b2a"
     private const val WX_REQ_SCOPE = "snsapi_userinfo"
     private const val WX_REQ_STATE = "wechat_sdk_demo_test"
 

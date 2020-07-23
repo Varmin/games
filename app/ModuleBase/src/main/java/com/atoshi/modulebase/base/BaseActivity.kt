@@ -14,10 +14,20 @@ import androidx.appcompat.app.AppCompatActivity
 abstract class BaseActivity : AppCompatActivity() {
     protected var TAG = "BaseActivity"
 
+    //是否全屏
+    protected var FULL_SCREEN = false
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        if(FULL_SCREEN){
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         TAG = localClassName
         super.onCreate(savedInstanceState)
-        setFullScreen()
         if (getLayoutView() != null) {
             setContentView(getLayoutView())
         }else{
@@ -33,12 +43,8 @@ abstract class BaseActivity : AppCompatActivity() {
     abstract fun initView()
 
 
-    private fun setFullScreen() {
-        requestWindowFeature(FEATURE_NO_TITLE)
-
-//        window.setFlags(
-//            WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-//            WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+    protected fun setFullScreen() {
+        //requestWindowFeature(FEATURE_NO_TITLE)
 
 //        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 //        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);//清除flag

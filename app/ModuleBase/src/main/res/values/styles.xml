@@ -9,7 +9,7 @@
 
     <style name="WXEntryTheme" parent="AppTheme">
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:windowBackground">#00000000</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
     </style>
