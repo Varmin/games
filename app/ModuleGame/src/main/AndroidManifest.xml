@@ -4,6 +4,7 @@
 
     <application>
         <activity android:name=".MainActivityGame"/>
+        <activity android:name=".GameActivity"/>
     </application>
 
 </manifest>

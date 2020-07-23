@@ -13,11 +13,11 @@ fun View.click(click: (View)-> Unit){
     setOnClickListener(click)
 }
 
-/*fun Activity.start(clazz: Class<out Activity>){
-    startActivity(Intent(this, clazz))
-}*/
+fun Activity.startPath(path: String){
+    startActivity(Intent(this, Class.forName(path)))
+}
 
-inline fun <reified T: Activity> Activity.start(){
+inline fun <reified T: Activity> Activity.startPath(){
     startActivity(Intent(this, T::class.java))
 }
 inline fun <reified T: Activity> Activity.startFinish(){

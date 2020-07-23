@@ -12,6 +12,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/app/ModuleAds" />
             <option value="$PROJECT_DIR$/app/ModuleBase" />
             <option value="$PROJECT_DIR$/app/ModuleGame" />
             <option value="$PROJECT_DIR$/app/ModuleLogin" />

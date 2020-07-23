@@ -52,10 +52,8 @@ interface ApiService {
     ): Observable<WxUserInfo>
 
 
-    //val body = RequestBody.create(MediaType.parse("application/json;charset=utf-8"), js.toString())
-    @POST("userLogin/register")
-    fun wxRegister(@Body body: RequestBody): Observable<String>
-
     @POST("userLogin/wxLogin")
-    fun wxLogin(@Body body: RequestBody): Observable<BaseResp<Empty>>
+    fun wxLogin(@Body body: RequestBody): Observable<BaseResp<UserInfo>>
+    @POST("userLogin/register")
+    fun wxRegister(@Body body: RequestBody): Observable<BaseResp<UserInfo>>
 }

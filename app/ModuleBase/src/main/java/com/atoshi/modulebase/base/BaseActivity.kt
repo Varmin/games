@@ -5,13 +5,14 @@ import android.view.View
 import android.view.Window
 import android.view.Window.*
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 /**
  * created by HYY on 2020/7/2
  * description:
  */
-abstract class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity(), BaseView {
     protected var TAG = "BaseActivity"
 
     //是否全屏
@@ -30,7 +31,7 @@ abstract class BaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         if (getLayoutView() != null) {
             setContentView(getLayoutView())
-        }else{
+        }else if(getLayoutId() != -1){
             setContentView(getLayoutId())
         }
         initData()
@@ -43,12 +44,13 @@ abstract class BaseActivity : AppCompatActivity() {
     abstract fun initView()
 
 
-    protected fun setFullScreen() {
-        //requestWindowFeature(FEATURE_NO_TITLE)
-
-//        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-//        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);//清除flag
-//        window.setStatusBarColor(resources.getColor(android.R.color.transparent));
-//        window.setTitleColor(resources.getColor(android.R.color.black))
+    override fun toast(toast: String) = Toast.makeText(this, toast, Toast.LENGTH_SHORT).show()
+    override fun loading() {
+        toast("loading")
     }
+
+    override fun loaded() {
+        toast("loaded")
+    }
+
 }

@@ -1,26 +1,183 @@
 package com.atoshi.modulelogin
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import com.atoshi.modulebase.base.BaseActivity
 import com.atoshi.modulebase.base.click
 import com.atoshi.modulebase.net.Api
-import com.atoshi.modulebase.net.model.WxAccessToken
-import com.atoshi.modulebase.net.model.WxUserInfo
+import com.atoshi.modulebase.net.model.*
+import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.wx.WXUtils
+import com.tencent.mm.opensdk.modelmsg.SendAuth
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_login.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 
 class MainActivityLogin : BaseActivity() {
+    private lateinit var mWxLoginReceiver: WxLoginReceiver
+
+    // TODO: by HY, 2020/7/23 EventBus
+    private val ACTION_WX_LOGIN = "action_wx_login"
+    inner class WxLoginReceiver: BroadcastReceiver(){
+        override fun onReceive(context: Context?, intent: Intent?) {
+            intent?.takeIf {
+                it.action == ACTION_WX_LOGIN && !it.getStringExtra("code").isNullOrEmpty()
+            }?.run {
+                getAccessToken(getStringExtra("code")!!)
+            }
+        }
+    }
     init {
         FULL_SCREEN = true
     }
     override fun getLayoutId(): Int = R.layout.activity_main_login
 
-    override fun initData() {}
+    override fun initData() {
+        mWxLoginReceiver = WxLoginReceiver()
+        registerReceiver(mWxLoginReceiver, IntentFilter(ACTION_WX_LOGIN))
+    }
 
     override fun initView() {
         tvLogin.click {
             WXUtils.login()
         }
+    }
+
+    override fun onBackPressed() {}
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(mWxLoginReceiver)
+    }
+
+
+
+
+
+    // TODO: by HY, 2020/7/16 map操作符优化
+    private fun loginOrRegister(resp: SendAuth.Resp) {
+    }
+
+
+    private fun getAccessToken(code: String) {
+        println("${javaClass.simpleName}.getAccessToken: $code")
+        Api.service.getAccessToken(code)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<WxAccessToken> {
+                override fun onSubscribe(d: Disposable?) {
+                    println("${javaClass.simpleName}.onSubscribe: ")
+                    loading()
+                }
+
+                override fun onNext(t: WxAccessToken?) {
+                    println("${javaClass.simpleName}.onNext: ${t?.openid} ")
+                    t?.apply { wxLogin(this) }
+                }
+
+                override fun onComplete() {}
+                override fun onError(e: Throwable?) {
+                    println("${javaClass.simpleName}.onError: ${e.toString()} ")
+                    loaded()
+                }
+            })
+    }
+
+
+
+    private fun wxLogin(wxAccessToken: WxAccessToken) {
+        var body = HashMap<String, String>()
+            .apply {
+                put("openId", wxAccessToken.openid!!)
+            }.let {
+                JSONObject(it as Map<*, *>).toString().toRequestBody("application/json;charset=utf-8".toMediaTypeOrNull())
+            }
+
+        Api.service.wxLogin(body)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : BaseObserver<UserInfo>() {
+                override fun onSuccess(data: UserInfo) {
+                    println("${javaClass.simpleName}.onSuccess: $data ")
+                    SPTool.putString(SPTool.WX_OPEN_ID, wxAccessToken.openid)
+                    finish()
+                }
+
+                override fun onError(code: Int, errMsg: String) {
+                    super.onError(code, errMsg)
+                    if(code == 4002) getUserInfo(wxAccessToken)
+                }
+            })
+    }
+
+
+    private fun getUserInfo(wxAccessToken: WxAccessToken) {
+        println("${javaClass.simpleName}.getUserInfo: ${wxAccessToken.access_token}, ${wxAccessToken.openid}, ${wxAccessToken.scope} ")
+        Api.service.getUserInfo(wxAccessToken.access_token!!, wxAccessToken.openid!!)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<WxUserInfo> {
+                override fun onSubscribe(d: Disposable?) {
+                    println("${javaClass.simpleName}.onSubscribe: ")
+                }
+
+                override fun onNext(info: WxUserInfo?) {
+                    info?.apply {
+                        println("${javaClass.simpleName}.onNext: $nickname, $headimgurl ")
+                        wxRegister(info)
+                    }
+                }
+
+                override fun onError(e: Throwable?) {
+                    println("${javaClass.simpleName}.onError: ${e.toString()} ")
+                    loaded()
+                }
+
+                override fun onComplete() {
+                    println("${javaClass.simpleName}.onComplete: ")
+                }
+            })
+    }
+
+    private fun wxRegister(info: WxUserInfo){
+        var body = HashMap<String, String>().apply {
+            put("city", info.city)
+            put("country", info.country)
+            put("headimgurl", info.headimgurl)
+            put("nickname", info.nickname)
+            put("openid", info.openid)
+            put("province", info.province)
+            put("sex", info.sex.toString())
+            put("unionid", info.unionid)
+        }.let {
+            JSONObject(it as Map<*, *>).toString().toRequestBody("application/json;charset=utf-8".toMediaTypeOrNull())
+        }
+        Api.service.wxRegister(body)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : BaseObserver<UserInfo>() {
+                override fun onSuccess(data: UserInfo) {
+                    println("${javaClass.simpleName}.onSuccess: $data ")
+                    SPTool.putString(SPTool.WX_OPEN_ID, info.openid)
+                    finish()
+                }
+
+                override fun onComplete() {
+                    super.onComplete()
+                    loaded()
+                }
+                override fun onError(code: Int, errMsg: String) {
+                    super.onError(code, errMsg)
+                    loaded()
+                }
+            })
     }
 }

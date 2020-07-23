@@ -54,7 +54,11 @@ class WXEntryActivity : AppCompatActivity(), IWXAPIEventHandler {
                 BaseResp.ErrCode.ERR_OK -> {
                     when (it.type) {
                         ConstantsAPI.COMMAND_SENDAUTH -> {
-                            getAccessToken(resp as SendAuth.Resp)
+                            Intent().apply {
+                                action = "action_wx_login"
+                                putExtra("code", (resp as SendAuth.Resp).code)
+                                sendBroadcast(this)
+                            }
                             "登录成功"
                         }
                         ConstantsAPI.COMMAND_SENDMESSAGE_TO_WX -> "分享成功"
@@ -63,144 +67,9 @@ class WXEntryActivity : AppCompatActivity(), IWXAPIEventHandler {
                 }
                 else -> "操作失败: code=${it.errCode}"
             }
-            toast(result)
+            Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
             finish()
         }
     }
 
-    // TODO: by HY, 2020/7/16 map操作符优化
-    private fun loginOrRegister(resp: SendAuth.Resp) {
-
-    }
-
-
-    private fun getAccessToken(resp: SendAuth.Resp) {
-        println("${javaClass.simpleName}.getAccessToken: ${resp.code}, ${resp.authResult}, ${resp.url} ")
-        Api.service.getAccessToken(resp.code)
-            .subscribe(object : Observer<WxAccessToken> {
-                override fun onSubscribe(d: Disposable?) {
-                    println("${javaClass.simpleName}.onSubscribe: ")
-                }
-
-                override fun onNext(t: WxAccessToken?) {
-                    println("${javaClass.simpleName}.onNext: ${t?.openid} ")
-                    t?.apply { wxLogin(this) }
-                }
-
-                override fun onError(e: Throwable?) {
-                    println("${javaClass.simpleName}.onError: ${e.toString()} ")
-                }
-
-                override fun onComplete() {
-                    println("${javaClass.simpleName}.onComplete: ")
-                }
-            })
-    }
-
-    private fun wxLogin(wxAccessToken: WxAccessToken) {
-        var body = HashMap<String, String>()
-            .apply {
-                put("openId", wxAccessToken.openid!!)
-            }.let {
-                JSONObject(it as Map<*, *>).toString().toRequestBody("application/json;charset=utf-8".toMediaTypeOrNull())
-            }
-
-       /* Api.service.wxLogin(body)
-            .subscribe(object : Observer<String>{
-                override fun onComplete() {
-                    println("${javaClass.simpleName}.onComplete:  ")
-                }
-
-                override fun onSubscribe(d: Disposable?) {
-                    println("${javaClass.simpleName}.onSubscribe: ")
-                }
-
-                override fun onNext(t: String?) {
-                    println("${javaClass.simpleName}.onNext: $t ")
-                    //getUserInfo(wxAccessToken)
-                }
-
-                override fun onError(e: Throwable?) {
-                    println("${javaClass.simpleName}.onError: ${e.toString()} ")
-                }
-            })*/
-
-        Api.service.wxLogin(body)
-            .subscribe(object : BaseObserver<Empty>() {
-                override fun onSuccess(data: Empty) {
-                    println("${javaClass.simpleName}.onSuccess: empty ")
-                }
-
-                override fun onError(code: Int, errMsg: String) {
-                    super.onError(code, errMsg)
-                    if(code == 4002) getUserInfo(wxAccessToken)
-                }
-
-            })
-    }
-
-
-    private fun getUserInfo(wxAccessToken: WxAccessToken) {
-        println("${javaClass.simpleName}.getUserInfo: ${wxAccessToken.access_token}, ${wxAccessToken.openid}, ${wxAccessToken.scope} ")
-        Api.service.getUserInfo(wxAccessToken.access_token!!, wxAccessToken.openid!!)
-            .subscribe(object : Observer<WxUserInfo> {
-                override fun onSubscribe(d: Disposable?) {
-                    println("${javaClass.simpleName}.onSubscribe: ")
-                }
-
-                override fun onNext(info: WxUserInfo?) {
-                    info?.apply {
-                        println("${javaClass.simpleName}.onNext: $nickname, $headimgurl ")
-                        wxRegister(info)
-                    }
-                }
-
-                override fun onError(e: Throwable?) {
-                    println("${javaClass.simpleName}.onError: ${e.toString()} ")
-                }
-
-                override fun onComplete() {
-                    println("${javaClass.simpleName}.onComplete: ")
-                }
-            })
-    }
-
-    private fun wxRegister(info: WxUserInfo){
-        var body = HashMap<String, String>().apply {
-            put("city", info.city)
-            put("country", info.country)
-            put("headimgurl", info.headimgurl)
-            put("nickname", info.nickname)
-            put("openid", info.openid)
-            put("province", info.province)
-            put("sex", info.sex.toString())
-            put("unionid", info.unionid)
-        }.let {
-            JSONObject(it as Map<*, *>).toString().toRequestBody("application/json;charset=utf-8".toMediaTypeOrNull())
-        }
-        Api.service.wxRegister(body)
-            .subscribe(object :Observer<String>{
-                override fun onComplete() {
-                    println("${javaClass.simpleName}.onComplete:  ")
-                }
-
-                override fun onSubscribe(d: Disposable?) {
-                    println("${javaClass.simpleName}.onSubscribe: ")
-                }
-
-                override fun onNext(t: String?) {
-                    println("${javaClass.simpleName}.onNext: $t ")
-                }
-
-                override fun onError(e: Throwable?) {
-                    println("${javaClass.simpleName}.onError: ${e.toString()} ")
-                }
-
-            })
-    }
-
-
-    private fun toast(toast: String) {
-        Toast.makeText(this, toast, Toast.LENGTH_SHORT).show()
-    }
 }
