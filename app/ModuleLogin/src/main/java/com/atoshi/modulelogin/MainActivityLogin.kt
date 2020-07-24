@@ -109,6 +109,7 @@ class MainActivityLogin : BaseActivity() {
                 override fun onSuccess(data: UserInfo) {
                     println("${javaClass.simpleName}.onSuccess: $data ")
                     SPTool.putString(SPTool.WX_OPEN_ID, wxAccessToken.openid)
+                    SPTool.putString(SPTool.APP_USER_TOKEN, data.token)
                     sendReloadUrl()
                     finish()
                 }
@@ -174,6 +175,7 @@ class MainActivityLogin : BaseActivity() {
                 override fun onSuccess(data: UserInfo) {
                     println("${javaClass.simpleName}.onSuccess: $data ")
                     SPTool.putString(SPTool.WX_OPEN_ID, info.openid)
+                    SPTool.putString(SPTool.APP_USER_TOKEN, data.token)
                     sendReloadUrl()
                     finish()
                 }

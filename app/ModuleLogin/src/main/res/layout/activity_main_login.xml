@@ -38,20 +38,21 @@
         android:background="@drawable/shape_rectangle_round"
         android:textColor="@color/color_ffffff"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="150dp"
         android:paddingRight="30dp"
         android:paddingLeft="30dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
+        android:layout_above="@id/_tvPrivate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
     <TextView
+        android:id="@+id/_tvPrivate"
         android:text="登录表示已同意《用户协议》和《隐私政策》"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="100dp"
+        android:textSize="@dimen/dp_14"
         android:paddingRight="30dp"
         android:paddingLeft="30dp"
         android:paddingTop="10dp"

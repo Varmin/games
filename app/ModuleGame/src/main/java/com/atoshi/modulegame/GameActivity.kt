@@ -83,7 +83,8 @@ class GameActivity : BaseActivity() {
     // TODO: by HY, 2020/7/24 WebView优化：缓存、预加载...
     private fun loadUrl() {
         var openId = SPTool.getString(SPTool.WX_OPEN_ID)
-        mWebView.loadUrl("http://game.atoshi.mobi/shenhe?uname=123456&openid=$openId")
+        var token = SPTool.getString(SPTool.APP_USER_TOKEN)
+        mWebView.loadUrl("http://game.atoshi.mobi/shenhe?uname=123456&openid=$openId&token=$token")
 //        mWebView.loadUrl("https://www.baidu.com/")
     }
 

@@ -2,10 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.atoshi.games">
 
+    <!--
+    TODO: by HY, 2020/7/24
+    ic_launcher: 无论改成什么名字，只要出现多个同名文件，就会显示异常
+    -->
     <application
         android:name=".App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_main"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
