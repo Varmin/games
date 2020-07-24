@@ -6,8 +6,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.view.*
 import com.atoshi.modulebase.base.BaseActivity
-import com.atoshi.modulebase.base.startPath
+import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.utils.SPTool
+import com.atoshi.modulebase.utils.isExitClickFirst
+import com.atoshi.modulebase.utils.isFastClick
 import com.tencent.smtt.sdk.WebView
 import com.tencent.smtt.sdk.WebViewClient
 
@@ -72,22 +74,30 @@ class GameActivity : BaseActivity() {
                         }
                     }
                 }
-                loadUrl()
                 setContentView(mWebView)
-            }, 10)
+                loadUrl()
+            }, 500)
         }
     }
 
+    // TODO: by HY, 2020/7/24 WebView优化：缓存、预加载...
     private fun loadUrl() {
         var openId = SPTool.getString(SPTool.WX_OPEN_ID)
         mWebView.loadUrl("http://game.atoshi.mobi/shenhe?uname=123456&openid=$openId")
+//        mWebView.loadUrl("https://www.baidu.com/")
     }
 
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK && mWebView.canGoBack()) {
-            mWebView.goBack()
-            return true
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            /*if(mWebView.canGoBack()){
+                mWebView.goBack()
+                return true
+            }else */
+            if(isExitClickFirst()){
+                toast("再按一次退出应用")
+                return true
+            }
         }
         return super.onKeyDown(keyCode, event)
     }

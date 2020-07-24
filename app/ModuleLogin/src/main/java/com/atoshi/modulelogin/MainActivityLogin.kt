@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import com.atoshi.modulebase.base.BaseActivity
-import com.atoshi.modulebase.base.click
+import com.atoshi.modulebase.utils.click
 import com.atoshi.modulebase.net.Api
 import com.atoshi.modulebase.net.model.*
 import com.atoshi.modulebase.utils.SPTool
@@ -46,6 +46,7 @@ class MainActivityLogin : BaseActivity() {
 
     override fun initView() {
         tvLogin.click {
+            loading()
             WXUtils.login()
         }
     }

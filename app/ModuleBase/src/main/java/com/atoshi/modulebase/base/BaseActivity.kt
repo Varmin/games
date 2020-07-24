@@ -1,15 +1,11 @@
 package com.atoshi.modulebase.base
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.*
-import android.view.Window.*
 import android.widget.FrameLayout
 import android.widget.ProgressBar
-import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
 import androidx.core.view.children
 
 /**
@@ -21,14 +17,22 @@ abstract class BaseActivity : AppCompatActivity(), BaseView {
 
     //是否全屏
     protected var FULL_SCREEN = false
+    protected var TRANSLUCENT_STATUS = false
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         if (FULL_SCREEN) {
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+            )
+        }
+        if (TRANSLUCENT_STATUS){
             window.setFlags(
                 WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
                 WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
             )
         }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,6 +56,14 @@ abstract class BaseActivity : AppCompatActivity(), BaseView {
     override fun toast(toast: String) = Toast.makeText(this, toast, Toast.LENGTH_SHORT).show()
     override fun loading() {
         // TODO: by HY, 2020/7/23 动态加载xml自定义
+
+        var content = findViewById<ViewGroup>(android.R.id.content)
+        for (view in content.children.iterator()) {
+            (view.tag as? String)?.run {
+                if(this == "loading") return
+            }
+        }
+
         var bar = ProgressBar(this).apply {
             layoutParams = FrameLayout.LayoutParams(100, 100).apply {
                 gravity = Gravity.CENTER or Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL
@@ -66,8 +78,10 @@ abstract class BaseActivity : AppCompatActivity(), BaseView {
         var content = findViewById<ViewGroup>(android.R.id.content)
         for (view in content.children.iterator()) {
             (view.tag as? String)?.run {
-                content.removeView(view)
-                return
+                if(this == "loading"){
+                    content.removeView(view)
+                    return
+                }
             }
         }
     }

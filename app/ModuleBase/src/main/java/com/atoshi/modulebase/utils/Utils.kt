@@ -1,4 +1,4 @@
-package com.atoshi.modulebase.base
+package com.atoshi.modulebase.utils
 
 import android.app.Activity
 import android.content.Intent
@@ -25,3 +25,21 @@ inline fun <reified T: Activity> Activity.startFinish(){
     finish()
 }
 
+private var mLastClickTime: Long = 0
+fun isFastClick(): Boolean {
+    val time = System.currentTimeMillis()
+    val timeD: Long = time - mLastClickTime
+    if (timeD in 1..200) return true
+    mLastClickTime = time
+    return false
+}
+
+fun isExitClickFirst(): Boolean {
+    val time = System.currentTimeMillis()
+    val timeD: Long = time - mLastClickTime
+    if (timeD > 2000){
+        mLastClickTime = time
+        return true
+    }
+    return false
+}

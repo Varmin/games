@@ -2,7 +2,7 @@ package com.atoshi.games
 
 import android.text.TextUtils
 import com.atoshi.modulebase.base.BaseActivity
-import com.atoshi.modulebase.base.startPath
+import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.utils.SPTool
 
 // TODO: by HY, 2020/7/22 放到base模块
@@ -22,6 +22,6 @@ class SplashActivity : BaseActivity() {
                 startPath("com.atoshi.modulelogin.MainActivityLogin")
             }
             finish()
-        }, 2000)
+        }, 1000)
     }
 }
