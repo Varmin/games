@@ -59,5 +59,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.0'
 //    implementation 'androidx.viewpager2:viewpager2:1.0.0'
 
+    //todo application区分
     api project(":app:ModuleBase")
+    api project(":app:ModuleAds")
 }

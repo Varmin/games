@@ -55,6 +55,7 @@ dependencies {
 
     if(IS_APPLICATION){
         implementation project(":app:ModuleBase")
+        implementation project(":app:ModuleAds")
     }else {
         implementation project(":app:ModuleLogin")
         implementation project(":app:ModuleGame")
