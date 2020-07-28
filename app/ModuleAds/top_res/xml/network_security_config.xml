@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--兼容部分第三方广告SDK存在Http请求-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

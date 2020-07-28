@@ -2,8 +2,48 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.atoshi.moduleads">
 
-    <application>
-        <activity android:name=".MainActivityAds"/>
+    <application
+        android:networkSecurityConfig="@xml/network_security_config"
+        >
+
+        <!--9.0适配-->
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+        <activity android:name=".MainActivityAds" />
+
+        <!--todo 作为Application时在另一个xml中设置-->
+        <service
+            android:name="com.qq.e.comm.DownloadService"
+            android:exported="false" />
+
+        <activity
+            android:name="com.qq.e.ads.ADActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
+
+        <activity
+            android:name="com.qq.e.ads.PortraitADActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.qq.e.ads.LandscapeADActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:screenOrientation="landscape" />
+
+        <provider
+            android:name="com.anythink.network.gdt.GDTATFileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/anythink_bk_gdt_file_path" />
+        </provider>
     </application>
 
 </manifest>
+
+
+
+

@@ -1,10 +1,10 @@
 ## TODO
+* 组件化拆分！！！
 * 资源文件压缩
 * API动态更换url
 * ApiService返回值：Call可以手动控制异步、Observable在哪控制的？
 ```
 Api.service.testGet2()
-
     // TODO: by HY, 2020/7/15 封装线程切换   
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
