@@ -3,7 +3,6 @@ package com.atoshi.games
 import android.app.Application
 import android.os.Build
 import android.webkit.WebView
-import androidx.annotation.RequiresApi
 import androidx.multidex.MultiDexApplication
 import com.anythink.core.api.ATSDK
 import com.anythink.core.api.ATSDKInitListener
