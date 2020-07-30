@@ -36,7 +36,6 @@ class App: MultiDexApplication() {
             override fun onFail(fail: String?) {
                 println("App.onFail: $fail")
             }
-
         })
         ATSDK.integrationChecking(this)
     }
