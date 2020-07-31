@@ -22,13 +22,15 @@ class App: MultiDexApplication() {
 
         //Webview多进程兼容（聚合快手时必须添加）
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
-            && packageName != Application.getProcessName()){
+            && packageName !=
+
+
+            Application.getProcessName()){
             WebView.setDataDirectorySuffix(Application.getProcessName())
         }
 
-        var TOPON_APP_ID = "a5f1fcab2e2222"
-        var TOPON_APP_KEY = "080129c71828b0013266ca336e29abe4"
-        ATSDK.init(this, TOPON_APP_ID, TOPON_APP_KEY, object : ATSDKInitListener{
+        if(BuildConfig.DEBUG) ATSDK.setNetworkLogDebug(true)
+        ATSDK.init(this, TopTest.TOPON_APP_ID, TopTest.TOPON_APP_KEY, object : ATSDKInitListener{
             override fun onSuccess() {
                 println("App.onSuccess")
             }
@@ -36,6 +38,7 @@ class App: MultiDexApplication() {
                 println("App.onFail: $fail")
             }
         })
+        //验证sdk集成是否正确
         ATSDK.integrationChecking(this)
     }
 }

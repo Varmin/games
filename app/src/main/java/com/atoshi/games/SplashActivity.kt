@@ -1,5 +1,6 @@
 package com.atoshi.games
 
+import android.view.KeyEvent
 import com.anythink.core.api.ATAdInfo
 import com.anythink.core.api.AdError
 import com.anythink.splashad.api.ATSplashAd
@@ -20,16 +21,12 @@ class SplashActivity : BaseActivity() {
     override fun initData() {}
 
     override fun initView() {
-        /*window.decorView.postDelayed({
-            // TODO: by HY, 2020/7/23 SP、数据库：存储位置、清除逻辑
-            if(TextUtils.isEmpty(SPTool.getString(SPTool.WX_OPEN_ID))){
-                startPath("com.atoshi.modulelogin.MainActivityLogin")
-            }
-            finish()
-        }, 1000)*/
+        mSplashAd = ATSplashAd(this, flAdsContainer, TopTest.SPLASH_ID_GDT, ATListener())
+    }
 
-
-        mSplashAd = ATSplashAd(this, flAdsContainer, "placementId", ATListener())
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if(keyCode == KeyEvent.KEYCODE_BACK) return true
+        return super.onKeyDown(keyCode, event)
     }
 
     override fun onDestroy() {
@@ -40,10 +37,12 @@ class SplashActivity : BaseActivity() {
     inner class ATListener: ATSplashAdListener{
         override fun onAdDismiss(p0: ATAdInfo?) {
             println("ATListener.onAdDismiss: $p0")
+            finishSplash()
         }
 
         override fun onNoAdError(p0: AdError?) {
-            println("ATListener.onNoAdError: $p0")
+            println("ATListener.onNoAdError: ${p0?.printStackTrace()}")
+            finishSplash()
         }
 
         override fun onAdShow(p0: ATAdInfo?) {
@@ -61,8 +60,11 @@ class SplashActivity : BaseActivity() {
         override fun onAdLoaded() {
             println("ATListener.onAdLoaded")
         }
-
     }
 
+
+    fun finishSplash() {
+        finish()
+    }
 
 }
