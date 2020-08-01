@@ -1,8 +1,10 @@
 package com.atoshi.games
 
+import android.content.Intent
 import android.view.KeyEvent
 import com.anythink.core.api.ATAdInfo
 import com.anythink.core.api.AdError
+import com.anythink.interstitial.api.ATInterstitialListener
 import com.anythink.splashad.api.ATSplashAd
 import com.anythink.splashad.api.ATSplashAdListener
 import com.atoshi.modulebase.base.BaseActivity
@@ -10,7 +12,7 @@ import kotlinx.android.synthetic.main.activity_splash.*
 
 // TODO: by HY, 2020/7/22 放到base模块
 class SplashActivity : BaseActivity() {
-    private lateinit var mSplashAd: ATSplashAd
+    //private lateinit var mSplashAd: ATSplashAd
 
     init {
         FULL_SCREEN = true
@@ -21,7 +23,9 @@ class SplashActivity : BaseActivity() {
     override fun initData() {}
 
     override fun initView() {
-        mSplashAd = ATSplashAd(this, flAdsContainer, TopTest.SPLASH_ID_GDT, ATListener())
+        //mSplashAd = ATSplashAd(this, flAdsContainer, TopOnHelper.SPLASH_ID_GDT, TopOnSplashListener())
+        startActivity(Intent(this, TopOnTestActivity::class.java))
+        finish()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -31,40 +35,46 @@ class SplashActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mSplashAd.onDestory()
+        //mSplashAd.onDestory()
     }
 
-    inner class ATListener: ATSplashAdListener{
+
+    inner class TopOnSplashListener: ATSplashAdListener {
         override fun onAdDismiss(p0: ATAdInfo?) {
-            println("ATListener.onAdDismiss: $p0")
+            println("TopOnSplashListener.onAdDismiss: $p0")
             finishSplash()
         }
 
         override fun onNoAdError(p0: AdError?) {
-            println("ATListener.onNoAdError: ${p0?.printStackTrace()}")
+            println("TopOnSplashListener.onNoAdError: ${p0?.printStackTrace()}")
             finishSplash()
         }
 
         override fun onAdShow(p0: ATAdInfo?) {
-            println("ATListener.onAdShow: $p0")
+            println("TopOnSplashListener.onAdShow: $p0")
         }
 
         override fun onAdClick(p0: ATAdInfo?) {
-            println("ATListener.onAdClick: $p0")
+            println("TopOnSplashListener.onAdClick: $p0")
         }
 
         override fun onAdTick(p0: Long) {
-            println("ATListener.onAdTick: $p0")
+            println("TopOnSplashListener.onAdTick: $p0")
         }
 
         override fun onAdLoaded() {
-            println("ATListener.onAdLoaded")
+            println("TopOnSplashListener.onAdLoaded")
         }
     }
-
-
     fun finishSplash() {
         finish()
     }
+
+
+
+
+
+
+
 
 }

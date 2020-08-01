@@ -30,7 +30,7 @@ class App: MultiDexApplication() {
         }
 
         if(BuildConfig.DEBUG) ATSDK.setNetworkLogDebug(true)
-        ATSDK.init(this, TopTest.TOPON_APP_ID, TopTest.TOPON_APP_KEY, object : ATSDKInitListener{
+        ATSDK.init(this, TopOnHelper.TOPON_APP_ID, TopOnHelper.TOPON_APP_KEY, object : ATSDKInitListener{
             override fun onSuccess() {
                 println("App.onSuccess")
             }

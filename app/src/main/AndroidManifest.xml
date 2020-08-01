@@ -2,10 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.atoshi.games">
 
-    <!--
-    TODO: by HY, 2020/7/24
-    ic_launcher: 无论改成什么名字，只要出现多个同名文件，就会显示异常
-    -->
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -14,11 +10,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".MainActivity"></activity>
-        <activity android:name=".SplashActivity"></activity>
+        <activity android:name=".TopOnTestActivity"></activity>
+        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".SplashActivity"
+            android:screenOrientation="portrait" />
         <activity android:name="com.atoshi.modulegame.GameActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

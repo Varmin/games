@@ -2,11 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.atoshi.moduleads">
 
-    <application
-        android:networkSecurityConfig="@xml/network_security_config"
-        >
-
-        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+    <application android:usesCleartextTraffic="true">
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
         <provider
             android:name="com.bytedance.sdk.openadsdk.multipro.TTMultiProvider"
             android:authorities="${applicationId}.TTMultiProvider"
@@ -27,7 +26,6 @@
         <activity
             android:name="com.qq.e.ads.ADActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
-
         <activity
             android:name="com.qq.e.ads.PortraitADActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
@@ -36,7 +34,6 @@
             android:name="com.qq.e.ads.LandscapeADActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:screenOrientation="landscape" />
-
         <provider
             android:name="com.anythink.network.gdt.GDTATFileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -47,7 +44,6 @@
                 android:resource="@xml/anythink_bk_gdt_file_path" />
         </provider>
     </application>
-
 </manifest>
 
 
