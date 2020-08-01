@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".TopOnTestActivity"></activity>
+        <activity android:name="com.atoshi.moduleads.TopOnTestActivity"></activity>
         <activity android:name=".MainActivity" />
         <activity
             android:name=".SplashActivity"

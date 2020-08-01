@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.view.*
+import android.webkit.JavascriptInterface
+import com.atoshi.moduleads.TopOnHelper
 import com.atoshi.modulebase.base.BaseActivity
 import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.utils.SPTool
@@ -47,7 +49,6 @@ class GameActivity : BaseActivity() {
             }
         }
     }
-
     override fun onDestroy() {
         super.onDestroy()
         mReceiverReload?.apply { unregisterReceiver(this) }
@@ -55,6 +56,24 @@ class GameActivity : BaseActivity() {
 
     // TODO: by HY, 2020/7/23 界面初始化：卡在哪些时间了？如何检测？如果有初始化放在哪里合适？
     override fun initView() {
+        TopOnHelper.interstitialLoad(this, TopOnHelper.INTER_ID_GDT, object : TopOnHelper.Callback{
+            override fun success() {
+                adsShowSuccess()
+            }
+
+            override fun error(placementId: String, error: String) {
+                adsShowError()
+            }
+        })
+        TopOnHelper.rewardLoad(this, TopOnHelper.REWARD_ID_GDT, object : TopOnHelper.Callback{
+            override fun success() {
+                adsShowSuccess()
+            }
+
+            override fun error(placementId: String, error: String) {
+                adsShowError()
+            }
+        })
         window.decorView.apply {
             postDelayed({
                 mWebView = WebView(this@GameActivity).apply {
@@ -73,6 +92,19 @@ class GameActivity : BaseActivity() {
                             return true
                         }
                     }
+                    addJavascriptInterface(object{
+                        @JavascriptInterface
+                        fun showIntersAds(){
+                            TopOnHelper.interstitialShow()
+                        }
+
+                        @JavascriptInterface
+                        fun showRewardAds(){
+                            TopOnHelper.rewardShow()
+                        }
+
+
+                    }, "AtoshiGame")
                 }
                 setContentView(mWebView)
                 loadUrl()
@@ -88,7 +120,6 @@ class GameActivity : BaseActivity() {
 //        mWebView.loadUrl("https://www.baidu.com/")
     }
 
-
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             /*if(mWebView.canGoBack()){
@@ -101,6 +132,15 @@ class GameActivity : BaseActivity() {
             }
         }
         return super.onKeyDown(keyCode, event)
+    }
+
+    private fun adsShowSuccess(){
+        var loadUrl = "javascript:adsShowSuccess()"
+        mWebView.loadUrl(loadUrl)
+    }
+    private fun adsShowError(){
+        var loadUrl = "javascript:adsShowError()"
+        mWebView.loadUrl(loadUrl)
     }
 }
 

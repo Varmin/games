@@ -6,6 +6,7 @@ import android.webkit.WebView
 import androidx.multidex.MultiDexApplication
 import com.anythink.core.api.ATSDK
 import com.anythink.core.api.ATSDKInitListener
+import com.atoshi.moduleads.TopOnHelper
 import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.wx.WXUtils
 

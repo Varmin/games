@@ -1,19 +1,17 @@
 package com.atoshi.games
 
 import android.content.Intent
+import android.text.TextUtils
 import android.view.KeyEvent
-import com.anythink.core.api.ATAdInfo
-import com.anythink.core.api.AdError
-import com.anythink.interstitial.api.ATInterstitialListener
-import com.anythink.splashad.api.ATSplashAd
-import com.anythink.splashad.api.ATSplashAdListener
+import com.atoshi.moduleads.TopOnHelper
+import com.atoshi.moduleads.TopOnTestActivity
 import com.atoshi.modulebase.base.BaseActivity
+import com.atoshi.modulebase.utils.SPTool
+import com.atoshi.modulebase.utils.startPath
 import kotlinx.android.synthetic.main.activity_splash.*
 
 // TODO: by HY, 2020/7/22 放到base模块
 class SplashActivity : BaseActivity() {
-    //private lateinit var mSplashAd: ATSplashAd
-
     init {
         FULL_SCREEN = true
     }
@@ -23,9 +21,25 @@ class SplashActivity : BaseActivity() {
     override fun initData() {}
 
     override fun initView() {
-        //mSplashAd = ATSplashAd(this, flAdsContainer, TopOnHelper.SPLASH_ID_GDT, TopOnSplashListener())
-        startActivity(Intent(this, TopOnTestActivity::class.java))
-        finish()
+        TopOnHelper.splashAds(flAdsContainer, TopOnHelper.SPLASH_ID_GDT, object :TopOnHelper.Callback{
+            override fun success() {
+                checkLogin()
+            }
+
+            override fun error(placementId: String, error: String) {
+                checkLogin()
+            }
+
+            fun checkLogin(){
+                /*window.decorView.post{
+                    // TODO: by HY, 2020/7/23 SP、数据库：存储位置、清除逻辑
+                    if(TextUtils.isEmpty(SPTool.getString(SPTool.WX_OPEN_ID))){
+                        startPath("com.atoshi.modulelogin.MainActivityLogin")
+                    }
+                }*/
+                startActivity(Intent(this@SplashActivity, TopOnTestActivity::class.java))
+            }
+        })
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -35,46 +49,6 @@ class SplashActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        //mSplashAd.onDestory()
+        TopOnHelper.onDestroy()
     }
-
-
-    inner class TopOnSplashListener: ATSplashAdListener {
-        override fun onAdDismiss(p0: ATAdInfo?) {
-            println("TopOnSplashListener.onAdDismiss: $p0")
-            finishSplash()
-        }
-
-        override fun onNoAdError(p0: AdError?) {
-            println("TopOnSplashListener.onNoAdError: ${p0?.printStackTrace()}")
-            finishSplash()
-        }
-
-        override fun onAdShow(p0: ATAdInfo?) {
-            println("TopOnSplashListener.onAdShow: $p0")
-        }
-
-        override fun onAdClick(p0: ATAdInfo?) {
-            println("TopOnSplashListener.onAdClick: $p0")
-        }
-
-        override fun onAdTick(p0: Long) {
-            println("TopOnSplashListener.onAdTick: $p0")
-        }
-
-        override fun onAdLoaded() {
-            println("TopOnSplashListener.onAdLoaded")
-        }
-    }
-    fun finishSplash() {
-        finish()
-    }
-
-
-
-
-
-
-
-
 }
