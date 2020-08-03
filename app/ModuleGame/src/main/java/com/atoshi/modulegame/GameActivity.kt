@@ -54,6 +54,28 @@ class GameActivity : BaseActivity() {
         mReceiverReload?.apply { unregisterReceiver(this) }
     }
 
+    // TODO: by HY, 2020/7/24 WebView优化：缓存、预加载...
+    private fun loadUrl() {
+        val openId = SPTool.getString(SPTool.WX_OPEN_ID)
+        val token = SPTool.getString(SPTool.APP_USER_TOKEN)
+
+        mWebView.loadUrl("http://game.atoshi.mobi/other/android?openid=$openId&token=$token")
+//      mWebView.loadUrl("https://www.baidu.com/")
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            /*if(mWebView.canGoBack()){
+                mWebView.goBack()
+                return true
+            }else */
+            if(isExitClickFirst()){
+                toast("再按一次退出应用")
+                return true
+            }
+        }
+        return super.onKeyDown(keyCode, event)
+    }
     // TODO: by HY, 2020/7/23 界面初始化：卡在哪些时间了？如何检测？如果有初始化放在哪里合适？
     override fun initView() {
         TopOnHelper.interstitialLoad(this, TopOnHelper.INTER_ID_GDT, object : TopOnHelper.Callback{
@@ -74,6 +96,7 @@ class GameActivity : BaseActivity() {
                 adsShowError()
             }
         })
+
         window.decorView.apply {
             postDelayed({
                 mWebView = WebView(this@GameActivity).apply {
@@ -112,27 +135,7 @@ class GameActivity : BaseActivity() {
         }
     }
 
-    // TODO: by HY, 2020/7/24 WebView优化：缓存、预加载...
-    private fun loadUrl() {
-        var openId = SPTool.getString(SPTool.WX_OPEN_ID)
-        var token = SPTool.getString(SPTool.APP_USER_TOKEN)
-        mWebView.loadUrl("http://game.atoshi.mobi/shenhe?uname=123456&openid=$openId&token=$token")
-//        mWebView.loadUrl("https://www.baidu.com/")
-    }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            /*if(mWebView.canGoBack()){
-                mWebView.goBack()
-                return true
-            }else */
-            if(isExitClickFirst()){
-                toast("再按一次退出应用")
-                return true
-            }
-        }
-        return super.onKeyDown(keyCode, event)
-    }
 
     private fun adsShowSuccess(){
         var loadUrl = "javascript:adsShowSuccess()"

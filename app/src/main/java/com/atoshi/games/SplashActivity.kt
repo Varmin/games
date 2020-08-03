@@ -1,10 +1,8 @@
 package com.atoshi.games
 
-import android.content.Intent
 import android.text.TextUtils
 import android.view.KeyEvent
 import com.atoshi.moduleads.TopOnHelper
-import com.atoshi.moduleads.TopOnTestActivity
 import com.atoshi.modulebase.base.BaseActivity
 import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.startPath
@@ -31,13 +29,10 @@ class SplashActivity : BaseActivity() {
             }
 
             fun checkLogin(){
-                /*window.decorView.post{
-                    // TODO: by HY, 2020/7/23 SP、数据库：存储位置、清除逻辑
-                    if(TextUtils.isEmpty(SPTool.getString(SPTool.WX_OPEN_ID))){
-                        startPath("com.atoshi.modulelogin.MainActivityLogin")
-                    }
-                }*/
-                startActivity(Intent(this@SplashActivity, TopOnTestActivity::class.java))
+                // TODO: by HY, 2020/7/23 SP、数据库：存储位置、清除逻辑
+                if(TextUtils.isEmpty(SPTool.getString(SPTool.WX_OPEN_ID))){
+                    startPath("com.atoshi.modulelogin.MainActivityLogin")
+                }
             }
         })
     }

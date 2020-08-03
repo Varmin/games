@@ -68,6 +68,7 @@ object TopOnHelper {
     /**
      * 激励视频
      */
+
     private var mRewardVideoAd: ATRewardVideoAd? = null
     fun rewardLoad(act: Activity, placementId: String, callback: Callback?){
         if(mRewardVideoAd == null){
