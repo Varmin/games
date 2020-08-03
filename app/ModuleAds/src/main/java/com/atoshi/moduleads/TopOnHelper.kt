@@ -12,20 +12,32 @@ import com.anythink.rewardvideo.api.ATRewardVideoAd
 import com.anythink.rewardvideo.api.ATRewardVideoListener
 import com.anythink.splashad.api.ATSplashAd
 import com.anythink.splashad.api.ATSplashAdListener
+import com.atoshi.modulebase.net.Api
+import com.atoshi.modulebase.net.model.BaseObserver
+import com.atoshi.modulebase.utils.SPTool
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.internal.addHeaderLenient
+import org.json.JSONObject
 
 /**
  */
 object TopOnHelper {
     val IS_TOP_OP = false
     val TOPON_APP_ID = if (IS_TOP_OP) "a5aa1f9deda26d" else "a5f1fcab2e2222"
-    val TOPON_APP_KEY = if (IS_TOP_OP) "4f7b9ac17decb9babec83aac078742c7" else "080129c71828b0013266ca336e29abe4"
+    val TOPON_APP_KEY =
+        if (IS_TOP_OP) "4f7b9ac17decb9babec83aac078742c7" else "080129c71828b0013266ca336e29abe4"
 
     //开屏广告
     var SPLASH_ID_PANGLE = if (IS_TOP_OP) "b5bea7c1b653ef" else "b5f1fcaca30866"
     var SPLASH_ID_GDT = if (IS_TOP_OP) "b5bea7bfd93f01" else "b5f1fcaca30866"
+
     //插屏广告
     var INTER_ID_PANGLE = if (IS_TOP_OP) "b5baca585a8fef" else "b5f23be649136c"
     var INTER_ID_GDT = if (IS_TOP_OP) "b5baca561bc100" else "b5f23be649136c"
+
     //激励视频
     var REWARD_ID_PANGLE = if (IS_TOP_OP) "b5b728e7a08cd4" else "b5f1fcb2d31a05"
     var REWARD_ID_GDT = if (IS_TOP_OP) "b5c2c880cb9d52" else "b5f1fcb2d31a05"
@@ -37,31 +49,32 @@ object TopOnHelper {
     private var mSplashAd: ATSplashAd? = null
     fun splashAds(container: ViewGroup, placementId: String, callback: Callback?) {
         var act = container.context as Activity
-        mSplashAd = ATSplashAd(act, container, placementId, TopOnSplashListener(act, placementId, callback))
+        mSplashAd =
+            ATSplashAd(act, container, placementId, TopOnSplashListener(act, placementId, callback))
     }
 
     fun onDestroy() {
         mSplashAd?.onDestory()
     }
 
-    //todo load加载失败...各种过程，如何准确给H5传递？
     /**
      * 插屏广告
      */
     private var mInterstitialAd: ATInterstitial? = null
-    fun interstitialLoad(context: Context, placementId: String, callback: Callback?){
-        if(mInterstitialAd == null){
+    fun interstitialLoad(context: Context, placementId: String, callback: Callback?) {
+        if (mInterstitialAd == null) {
             mInterstitialAd = ATInterstitial(context, INTER_ID_PANGLE).apply {
                 setAdListener(TopOnInterstitialListener(placementId, callback))
                 load()
             }
-        }else{
-            if(!mInterstitialAd!!.isAdReady) mInterstitialAd!!.load()
+        } else {
+            if (!mInterstitialAd!!.isAdReady) mInterstitialAd!!.load()
         }
     }
-    fun interstitialShow(){
+
+    fun interstitialShow() {
         mInterstitialAd?.run {
-            if(isAdReady) show() else load()
+            if (isAdReady) show() else load()
         }
     }
 
@@ -70,19 +83,20 @@ object TopOnHelper {
      */
 
     private var mRewardVideoAd: ATRewardVideoAd? = null
-    fun rewardLoad(act: Activity, placementId: String, callback: Callback?){
-        if(mRewardVideoAd == null){
+    fun rewardLoad(act: Activity, placementId: String, callback: Callback?) {
+        if (mRewardVideoAd == null) {
             mRewardVideoAd = ATRewardVideoAd(act, placementId).apply {
                 setAdListener(TopOnRewardListener(placementId, callback))
                 load()
             }
-        }else{
-            if(!mRewardVideoAd!!.isAdReady) mRewardVideoAd!!.load()
+        } else {
+            if (!mRewardVideoAd!!.isAdReady) mRewardVideoAd!!.load()
         }
     }
-    fun rewardShow(){
+
+    fun rewardShow() {
         mRewardVideoAd?.run {
-            if(isAdReady) show() else load()
+            if (isAdReady) show() else load()
         }
     }
 
@@ -93,7 +107,11 @@ object TopOnHelper {
         fun error(placementId: String, error: String)
     }
 
-    class TopOnSplashListener(private val act: Activity, private val placementId: String, private val callback: Callback?) : ATSplashAdListener {
+    class TopOnSplashListener(
+        private val act: Activity,
+        private val placementId: String,
+        private val callback: Callback?
+    ) : ATSplashAdListener {
         private var mSplashLoadStartTime: Long = SystemClock.currentThreadTimeMillis()
 
         override fun onAdDismiss(p0: ATAdInfo?) {
@@ -126,14 +144,19 @@ object TopOnHelper {
         }
     }
 
-    class TopOnInterstitialListener(private val placementId: String, private val callback: Callback?) : ATInterstitialListener {
+    class TopOnInterstitialListener(
+        private val placementId: String,
+        private val callback: Callback?
+    ) : ATInterstitialListener {
         override fun onInterstitialAdLoaded() {
             println("TopOnInterstitialListener.onInterstitialAdLoaded")
         }
+
         override fun onInterstitialAdShow(p0: ATAdInfo?) {
             println("TopOnInterstitialListener.onInterstitialAdShow: $p0")
             callback?.success()
         }
+
         override fun onInterstitialAdLoadFail(p0: AdError?) {
             println("TopOnInterstitialListener.onInterstitialAdLoadFail: ${p0?.printStackTrace()}")
             callback?.error(placementId, p0?.printStackTrace() ?: "")
@@ -164,7 +187,8 @@ object TopOnHelper {
         }
     }
 
-    class TopOnRewardListener(private val placementId: String, private val callback: Callback?) : ATRewardVideoListener {
+    class TopOnRewardListener(private val placementId: String, private val callback: Callback?) :
+        ATRewardVideoListener {
         //建议在此回调中调用load进行广告的加载，方便下一次广告的展示
         override fun onRewardedVideoAdClosed(p0: ATAdInfo?) {
             println("TopOnRewardListener.onRewardedVideoAdClosed: $p0")
@@ -177,7 +201,7 @@ object TopOnHelper {
 
         override fun onRewardedVideoAdPlayFailed(p0: AdError?, p1: ATAdInfo?) {
             println("TopOnRewardListener.onRewardedVideoAdPlayFailed: ${p0?.printStackTrace()}, $p1")
-            callback?.error(placementId, p0?.printStackTrace()+", "+ p1)
+            callback?.error(placementId, p0?.printStackTrace() + ", " + p1)
         }
 
         override fun onRewardedVideoAdLoaded() {
@@ -202,5 +226,26 @@ object TopOnHelper {
             println("TopOnRewardListener.onRewardedVideoAdPlayClicked: $p0")
         }
     }
+
+
+    const val TYPE_SPLASH = "splash"
+    const val TYPE_REWARD = "reward"
+    const val TYPE_INTERS = "inters"
+    fun getPlacementId(type: String, index: String = "0", callback: BaseObserver<String>) {
+        val body = HashMap<String, String>().run {
+            put("type", type)
+            put("index", index)
+            JSONObject(this as Map<*, *>).toString()
+                .toRequestBody("application/json;charset=utf-8".toMediaTypeOrNull())
+        }
+        Api.service.getPlacementId(body)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(callback)
+    }
+
+
 }
+
+
 

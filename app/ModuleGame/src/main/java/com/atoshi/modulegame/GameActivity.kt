@@ -131,7 +131,7 @@ class GameActivity : BaseActivity() {
                 }
                 setContentView(mWebView)
                 loadUrl()
-            }, 500)
+            }, 10)
         }
     }
 
