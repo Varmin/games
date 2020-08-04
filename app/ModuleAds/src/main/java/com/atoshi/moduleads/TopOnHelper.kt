@@ -14,17 +14,18 @@ import com.anythink.splashad.api.ATSplashAd
 import com.anythink.splashad.api.ATSplashAdListener
 import com.atoshi.modulebase.net.Api
 import com.atoshi.modulebase.net.model.BaseObserver
+import com.atoshi.modulebase.net.model.TOP_ON_AD_IDS
+import com.atoshi.modulebase.net.model.TopOnBean
 import com.atoshi.modulebase.utils.SPTool
+import com.google.gson.Gson
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.internal.addHeaderLenient
-import org.json.JSONObject
+import java.lang.Exception
 
 /**
  */
 object TopOnHelper {
+
     val IS_TOP_OP = false
     val TOPON_APP_ID = if (IS_TOP_OP) "a5aa1f9deda26d" else "a5f1fcab2e2222"
     val TOPON_APP_KEY =
@@ -43,6 +44,9 @@ object TopOnHelper {
     var REWARD_ID_GDT = if (IS_TOP_OP) "b5c2c880cb9d52" else "b5f1fcb2d31a05"
 
     //----------------------------------------fun----------------------------------------
+
+    var placementBean: TopOnBean? = null
+
     /**
      * 开屏广告
      */
@@ -81,7 +85,6 @@ object TopOnHelper {
     /**
      * 激励视频
      */
-
     private var mRewardVideoAd: ATRewardVideoAd? = null
     fun rewardLoad(act: Activity, placementId: String, callback: Callback?) {
         if (mRewardVideoAd == null) {
@@ -93,10 +96,50 @@ object TopOnHelper {
             if (!mRewardVideoAd!!.isAdReady) mRewardVideoAd!!.load()
         }
     }
-
     fun rewardShow() {
         mRewardVideoAd?.run {
             if (isAdReady) show() else load()
+        }
+    }
+
+
+
+
+
+    private val mIntersMap = HashMap<String, ATInterstitial>()
+    fun intersShow(act: Activity, index: Int, callback: Callback?) {
+        if (placementBean == null) {
+            getPlacementId()
+            callback?.error("", "未初始化")
+        } else {
+            val placementId = placementBean!!.inters?.get(index)
+            if (placementId.isNullOrEmpty()) {
+                callback?.error("", "暂无该index广告位")
+            } else {
+                var atrAd = mIntersMap[placementId] ?: ATInterstitial(act, placementId).apply {
+                    setAdListener(TopOnInterstitialListener(placementId, callback))
+                    mIntersMap[placementId] = this
+                }
+                atrAd.show()
+            }
+        }
+    }
+    private val mRewardMap = HashMap<String, ATRewardVideoAd>()
+    fun rewardShow(act: Activity, index: Int, callback: Callback?) {
+        if (placementBean == null) {
+            getPlacementId()
+            callback?.error("index: $index", "未初始化")
+        } else {
+            val placementId = placementBean!!.reward?.get(index)
+            if (placementId.isNullOrEmpty()) {
+                callback?.error("index: $index", "暂无该index广告位")
+            } else {
+                var atrAd = mRewardMap[placementId] ?: ATRewardVideoAd(act, placementId).apply {
+                    setAdListener(TopOnRewardListener(placementId, callback))
+                    mRewardMap[placementId] = this
+                }
+                atrAd.show()
+            }
         }
     }
 
@@ -184,6 +227,7 @@ object TopOnHelper {
             println("TopOnInterstitialListener.onInterstitialAdClose: $p0")
             //在此回调中调用load进行广告的加载，方便下一次广告的展示
             mInterstitialAd?.load()
+            mIntersMap[placementId]?.load()
         }
     }
 
@@ -193,6 +237,7 @@ object TopOnHelper {
         override fun onRewardedVideoAdClosed(p0: ATAdInfo?) {
             println("TopOnRewardListener.onRewardedVideoAdClosed: $p0")
             mRewardVideoAd?.load()
+            mRewardMap[placementId]?.load()
         }
 
         override fun onReward(p0: ATAdInfo?) {
@@ -228,17 +273,19 @@ object TopOnHelper {
     }
 
 
-    const val TYPE_SPLASH = "splash"
-    const val TYPE_REWARD = "reward"
-    const val TYPE_INTERS = "inters"
-    fun getPlacementId(callback: BaseObserver<String>, type: String, index: String = "0") {
-        Api.service.getPlacementId(type, index)
+    fun getPlacementId() {
+        Api.service.getPlacementId()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(callback)
+            .subscribe(object : BaseObserver<String>() {
+                override fun onSuccess(data: String) {
+                    try {
+                        placementBean = Gson().fromJson(data, TopOnBean::class.java)
+                        SPTool.putString(TOP_ON_AD_IDS, data)
+                    } catch (e: Exception) {}
+                }
+            })
     }
-
-
 }
 
 

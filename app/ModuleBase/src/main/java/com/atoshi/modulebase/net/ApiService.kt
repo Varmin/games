@@ -57,6 +57,6 @@ interface ApiService {
     @POST("userLogin/register")
     fun wxRegister(@Body body: RequestBody): Observable<BaseResp<UserInfo>>
     @GET("info/getAdId")
-    fun getPlacementId(@Query("type") type: String, @Query("index") index: String): Observable<BaseResp<String>>
+    fun getPlacementId(): Observable<BaseResp<String>>
 
 }

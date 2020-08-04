@@ -28,6 +28,15 @@ class GameActivity : BaseActivity() {
             }
         }
     }
+    var topOnCallback = object : TopOnHelper.Callback{
+        override fun success() {
+            adsShowSuccess()
+        }
+
+        override fun error(placementId: String, error: String) {
+            adsShowError("$placementId, $error")
+        }
+    }
 
     init {
         FULL_SCREEN = true
@@ -80,25 +89,6 @@ class GameActivity : BaseActivity() {
     }
     // TODO: by HY, 2020/7/23 界面初始化：卡在哪些时间了？如何检测？如果有初始化放在哪里合适？
     override fun initView() {
-        TopOnHelper.interstitialLoad(this, TopOnHelper.INTER_ID_GDT, object : TopOnHelper.Callback{
-            override fun success() {
-                adsShowSuccess()
-            }
-
-            override fun error(placementId: String, error: String) {
-                adsShowError()
-            }
-        })
-        TopOnHelper.rewardLoad(this, TopOnHelper.REWARD_ID_GDT, object : TopOnHelper.Callback{
-            override fun success() {
-                adsShowSuccess()
-            }
-
-            override fun error(placementId: String, error: String) {
-                adsShowError()
-            }
-        })
-
         window.decorView.apply {
             postDelayed({
                 mWebView = WebView(this@GameActivity).apply {
@@ -120,26 +110,35 @@ class GameActivity : BaseActivity() {
                     addJavascriptInterface(object{
                         @JavascriptInterface
                         fun showIntersAds(){
-                            TopOnHelper.interstitialShow()
+                            showIntersAds(0)
                         }
-
+                        @JavascriptInterface
+                        fun showIntersAds(index: Int){
+                            TopOnHelper.intersShow(this@GameActivity, index, topOnCallback)
+                        }
                         @JavascriptInterface
                         fun showRewardAds(){
-                            TopOnHelper.rewardShow()
+                            showRewardAds(0)
+                        }
+                        @JavascriptInterface
+                        fun showRewardAds(index: Int){
+                           TopOnHelper.rewardShow(this@GameActivity, index, topOnCallback)
                         }
 
                         @JavascriptInterface
                         fun signOut(){
                             SPTool.putString(WXUtils.WX_OPEN_ID, "")
                             SPTool.putString(WXUtils.APP_USER_TOKEN, "")
+                            runOnUiThread{
+                                toast("退出登录")
+                                finish()
+                            }
                         }
 
                         @JavascriptInterface
                         fun updateUserInfo(){
                             // TODO: 2020/8/4 更新头像、昵称信息
                         }
-
-
                     }, "AtoshiGame")
                 }
                 setContentView(mWebView)
@@ -154,9 +153,9 @@ class GameActivity : BaseActivity() {
         var loadUrl = "javascript:adsShowSuccess()"
         mWebView.loadUrl(loadUrl)
     }
-    private fun adsShowError(){
-        var loadUrl = "javascript:adsShowError()"
-        mWebView.loadUrl(loadUrl)
+    private fun adsShowError(errMsg: String){
+        mWebView.loadUrl("javascript:adsShowError()")
+        mWebView.loadUrl("javascript:adsShowError(\'$errMsg\')")
     }
 }
 
