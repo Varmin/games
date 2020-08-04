@@ -6,7 +6,6 @@ import com.atoshi.modulebase.net.model.TOP_ON_AD_IDS
 import com.atoshi.modulebase.net.model.TopOnBean
 import com.atoshi.moduleads.TopOnHelper
 import com.atoshi.modulebase.base.BaseActivity
-import com.atoshi.modulebase.net.model.BaseObserver
 import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.wx.WXUtils

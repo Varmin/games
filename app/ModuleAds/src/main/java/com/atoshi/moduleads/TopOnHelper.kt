@@ -96,6 +96,7 @@ object TopOnHelper {
             if (!mRewardVideoAd!!.isAdReady) mRewardVideoAd!!.load()
         }
     }
+
     fun rewardShow() {
         mRewardVideoAd?.run {
             if (isAdReady) show() else load()
@@ -103,11 +104,8 @@ object TopOnHelper {
     }
 
 
-
-
-
     private val mIntersMap = HashMap<String, ATInterstitial>()
-    fun intersShow(act: Activity, index: Int, callback: Callback?) {
+    fun intersShow(act: Activity, index: Int, loading: Boolean, callback: Callback?) {
         if (placementBean == null) {
             getPlacementId()
             callback?.error("", "未初始化")
@@ -120,12 +118,18 @@ object TopOnHelper {
                     setAdListener(TopOnInterstitialListener(placementId, callback))
                     mIntersMap[placementId] = this
                 }
-                atrAd.show()
+                if (loading || !atrAd.isAdReady) {
+                    atrAd.load()
+                    callback?.error("", "广告加载中...")
+                }else{
+                    atrAd.show()
+                }
             }
         }
     }
+
     private val mRewardMap = HashMap<String, ATRewardVideoAd>()
-    fun rewardShow(act: Activity, index: Int, callback: Callback?) {
+    fun rewardShow(act: Activity, index: Int, loading: Boolean, callback: Callback?) {
         if (placementBean == null) {
             getPlacementId()
             callback?.error("index: $index", "未初始化")
@@ -134,11 +138,17 @@ object TopOnHelper {
             if (placementId.isNullOrEmpty()) {
                 callback?.error("index: $index", "暂无该index广告位")
             } else {
-                var atrAd = mRewardMap[placementId] ?: ATRewardVideoAd(act, placementId).apply {
-                    setAdListener(TopOnRewardListener(placementId, callback))
-                    mRewardMap[placementId] = this
+                var atrAd = mRewardMap[placementId]
+                    ?: ATRewardVideoAd(act, placementId).apply {
+                        setAdListener(TopOnRewardListener(placementId, callback))
+                        mRewardMap[placementId] = this
+                    }
+                if (loading || !atrAd.isAdReady) {
+                    atrAd.load()
+                    callback?.error("", "广告加载中...")
+                }else{
+                    atrAd.show()
                 }
-                atrAd.show()
             }
         }
     }
@@ -274,18 +284,24 @@ object TopOnHelper {
 
 
     fun getPlacementId() {
+        getPlacementId(null)
+    }
+    fun getPlacementId(callback: (() -> Unit)?) {
         Api.service.getPlacementId()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : BaseObserver<String>() {
-                override fun onSuccess(data: String) {
+            .subscribe(object : BaseObserver<TopOnBean>() {
+                override fun onSuccess(data: TopOnBean) {
                     try {
-                        placementBean = Gson().fromJson(data, TopOnBean::class.java)
-                        SPTool.putString(TOP_ON_AD_IDS, data)
-                    } catch (e: Exception) {}
+                        callback?.invoke()
+                        SPTool.putString(TOP_ON_AD_IDS, Gson().toJson(data))
+                        placementBean = data
+                    } catch (e: Exception) {
+                    }
                 }
             })
     }
+
 }
 
 

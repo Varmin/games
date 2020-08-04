@@ -8,11 +8,10 @@ import android.view.*
 import android.webkit.JavascriptInterface
 import com.atoshi.moduleads.TopOnHelper
 import com.atoshi.modulebase.base.BaseActivity
-import com.atoshi.modulebase.net.model.WxUserInfo
+import com.atoshi.modulebase.net.model.TOP_ON_AD_IDS
 import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.isExitClickFirst
-import com.atoshi.modulebase.utils.isFastClick
 import com.atoshi.modulebase.wx.WXUtils
 import com.tencent.smtt.sdk.WebView
 import com.tencent.smtt.sdk.WebViewClient
@@ -30,11 +29,13 @@ class GameActivity : BaseActivity() {
     }
     var topOnCallback = object : TopOnHelper.Callback{
         override fun success() {
-            adsShowSuccess()
+            println("topOnCallback.success")
+            runOnUiThread{ adsShowSuccess()}
         }
 
         override fun error(placementId: String, error: String) {
-            adsShowError("$placementId, $error")
+            println("topOnCallback.error, $placementId, $error")
+            runOnUiThread { adsShowError("$placementId, $error") }
         }
     }
 
@@ -42,7 +43,7 @@ class GameActivity : BaseActivity() {
         FULL_SCREEN = true
     }
 
-    private lateinit var mWebView: WebView
+    private var mWebView: WebView? = null
 
     // TODO: by HY, 2020/7/23 声明周期， 在Activity生成但未显示的时候跳转：有没有更早的？
     override fun onAttachedToWindow() {
@@ -70,14 +71,14 @@ class GameActivity : BaseActivity() {
         val openId = SPTool.getString(WXUtils.WX_OPEN_ID)
         val token = SPTool.getString(WXUtils.APP_USER_TOKEN)
 
-        mWebView.loadUrl("http://game.atoshi.mobi/other/android?openid=$openId&token=$token")
-//      mWebView.loadUrl("https://www.baidu.com/")
+        mWebView?.loadUrl("http://game.atoshi.mobi/other/android?openid=$openId&token=$token")
+//      mWebView?.loadUrl("https://www.baidu.com/")
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            /*if(mWebView.canGoBack()){
-                mWebView.goBack()
+            /*if(mWebView?.canGoBack()){
+                mWebView?.goBack()
                 return true
             }else */
             if(isExitClickFirst()){
@@ -89,6 +90,20 @@ class GameActivity : BaseActivity() {
     }
     // TODO: by HY, 2020/7/23 界面初始化：卡在哪些时间了？如何检测？如果有初始化放在哪里合适？
     override fun initView() {
+        println("---------------------------------initView")
+       window.decorView.postDelayed({
+           if (SPTool.getString(TOP_ON_AD_IDS).isNullOrEmpty()) {
+               TopOnHelper.getPlacementId {
+                   TopOnHelper.intersShow(this@GameActivity, 0,true,  topOnCallback)
+                   TopOnHelper.rewardShow(this@GameActivity, 0,true,  topOnCallback)
+               }
+           }else{
+               TopOnHelper.intersShow(this@GameActivity, 0,true,  topOnCallback)
+               TopOnHelper.rewardShow(this@GameActivity, 0,true,  topOnCallback)
+           }
+       }, 3000)
+
+
         window.decorView.apply {
             postDelayed({
                 mWebView = WebView(this@GameActivity).apply {
@@ -114,7 +129,7 @@ class GameActivity : BaseActivity() {
                         }
                         @JavascriptInterface
                         fun showIntersAds(index: Int){
-                            TopOnHelper.intersShow(this@GameActivity, index, topOnCallback)
+                            TopOnHelper.intersShow(this@GameActivity, index,false, topOnCallback)
                         }
                         @JavascriptInterface
                         fun showRewardAds(){
@@ -122,7 +137,7 @@ class GameActivity : BaseActivity() {
                         }
                         @JavascriptInterface
                         fun showRewardAds(index: Int){
-                           TopOnHelper.rewardShow(this@GameActivity, index, topOnCallback)
+                           TopOnHelper.rewardShow(this@GameActivity, index,false,  topOnCallback)
                         }
 
                         @JavascriptInterface
@@ -150,12 +165,11 @@ class GameActivity : BaseActivity() {
 
 
     private fun adsShowSuccess(){
-        var loadUrl = "javascript:adsShowSuccess()"
-        mWebView.loadUrl(loadUrl)
+        mWebView?.loadUrl( "javascript:adsShowSuccess()")
     }
     private fun adsShowError(errMsg: String){
-        mWebView.loadUrl("javascript:adsShowError()")
-        mWebView.loadUrl("javascript:adsShowError(\'$errMsg\')")
+        mWebView?.loadUrl("javascript:adsShowError()")
+        mWebView?.loadUrl("javascript:adsShowError(\'$errMsg\')")
     }
 }
 
