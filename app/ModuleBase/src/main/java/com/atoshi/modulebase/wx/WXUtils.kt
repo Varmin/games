@@ -18,6 +18,9 @@ object WXUtils {
     const val WX_SECRET = "a4858d99ce5a4c533b7247e545a13b2a"
     private const val WX_REQ_SCOPE = "snsapi_userinfo"
     private const val WX_REQ_STATE = "wechat_sdk_demo_test"
+    //保存sp值的key
+    const val WX_OPEN_ID = "wx_open_id"
+    const val APP_USER_TOKEN = "app_user_token"
 
     private lateinit var mWxApi: IWXAPI
     private lateinit var mContext: Context

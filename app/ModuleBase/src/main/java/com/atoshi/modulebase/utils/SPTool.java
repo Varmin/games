@@ -11,9 +11,6 @@ import android.content.SharedPreferences;
  */
 
 public class SPTool {
-    public static final String WX_OPEN_ID = "wx_open_id";
-    public static final String APP_USER_TOKEN = "app_user_token";
-
     //----------------------------------------------------
     private final static String JSON_CACHE = "JSON_CACHE";
     private final static String SP_NAME_DEFAULT = "atoshi_games_sp";

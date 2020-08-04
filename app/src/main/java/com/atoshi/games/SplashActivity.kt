@@ -7,6 +7,7 @@ import com.atoshi.modulebase.base.BaseActivity
 import com.atoshi.modulebase.net.model.BaseObserver
 import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.startPath
+import com.atoshi.modulebase.wx.WXUtils
 import kotlinx.android.synthetic.main.activity_splash.*
 
 // TODO: by HY, 2020/7/22 放到base模块
@@ -28,6 +29,7 @@ class SplashActivity : BaseActivity() {
         }
     }
 
+    // TODO: yang 2020/8/4 5s未返回强制跳转
     private fun splashAds(placementId: String){
         TopOnHelper.splashAds(flAdsContainer, placementId, object :TopOnHelper.Callback{
             override fun success() {
@@ -40,7 +42,7 @@ class SplashActivity : BaseActivity() {
     }
 
     private fun getPlacementId(){
-        TopOnHelper.getPlacementId(TopOnHelper.TYPE_SPLASH, "0", object : BaseObserver<String>(){
+        TopOnHelper.getPlacementId(object : BaseObserver<String>(){
             override fun onSuccess(data: String) {
                 SPTool.putString(TopOnHelper.TYPE_SPLASH, data)
                 checkLogin()
@@ -48,12 +50,12 @@ class SplashActivity : BaseActivity() {
             override fun onError(errCode: Int, errMsg: String) {
                 checkLogin()
             }
-        })
+        }, TopOnHelper.TYPE_SPLASH)
     }
 
     fun checkLogin(){
         // TODO: by HY, 2020/7/23 SP、数据库：存储位置、清除逻辑
-        if(TextUtils.isEmpty(SPTool.getString(SPTool.WX_OPEN_ID))){
+        if(TextUtils.isEmpty(SPTool.getString(WXUtils.WX_OPEN_ID))){
             startPath("com.atoshi.modulelogin.MainActivityLogin")
         }
         finish()

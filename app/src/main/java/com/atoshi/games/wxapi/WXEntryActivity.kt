@@ -1,30 +1,16 @@
 package com.atoshi.games.wxapi
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import com.atoshi.modulebase.net.Api
-import com.atoshi.modulebase.net.model.BaseObserver
-import com.atoshi.modulebase.net.model.Empty
-import com.atoshi.modulebase.net.model.WxAccessToken
-import com.atoshi.modulebase.net.model.WxUserInfo
+import androidx.appcompat.app.AppCompatActivity
 import com.atoshi.modulebase.wx.WXUtils
 import com.atoshi.modulelogin.ACTION_WX_LOGIN
-import com.atoshi.modulelogin.MainActivityLogin
-import com.google.gson.JsonObject
 import com.tencent.mm.opensdk.constants.ConstantsAPI
 import com.tencent.mm.opensdk.modelbase.BaseReq
 import com.tencent.mm.opensdk.modelbase.BaseResp
 import com.tencent.mm.opensdk.modelmsg.SendAuth
 import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler
-import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.disposables.Disposable
-import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
 
 class WXEntryActivity : AppCompatActivity(), IWXAPIEventHandler {
     override fun onCreate(savedInstanceState: Bundle?) {

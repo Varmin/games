@@ -8,10 +8,12 @@ import android.view.*
 import android.webkit.JavascriptInterface
 import com.atoshi.moduleads.TopOnHelper
 import com.atoshi.modulebase.base.BaseActivity
+import com.atoshi.modulebase.net.model.WxUserInfo
 import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.isExitClickFirst
 import com.atoshi.modulebase.utils.isFastClick
+import com.atoshi.modulebase.wx.WXUtils
 import com.tencent.smtt.sdk.WebView
 import com.tencent.smtt.sdk.WebViewClient
 
@@ -43,7 +45,7 @@ class GameActivity : BaseActivity() {
     override fun getLayoutId(): Int = -1
 
     override fun initData() {
-        if(SPTool.getString(SPTool.WX_OPEN_ID).isNullOrEmpty()){
+        if(SPTool.getString(WXUtils.WX_OPEN_ID).isNullOrEmpty()){
             mReceiverReload = ReceiverReload().apply {
                 registerReceiver(this, IntentFilter(ACTION_LOAD_URL))
             }
@@ -56,8 +58,8 @@ class GameActivity : BaseActivity() {
 
     // TODO: by HY, 2020/7/24 WebView优化：缓存、预加载...
     private fun loadUrl() {
-        val openId = SPTool.getString(SPTool.WX_OPEN_ID)
-        val token = SPTool.getString(SPTool.APP_USER_TOKEN)
+        val openId = SPTool.getString(WXUtils.WX_OPEN_ID)
+        val token = SPTool.getString(WXUtils.APP_USER_TOKEN)
 
         mWebView.loadUrl("http://game.atoshi.mobi/other/android?openid=$openId&token=$token")
 //      mWebView.loadUrl("https://www.baidu.com/")
@@ -124,6 +126,17 @@ class GameActivity : BaseActivity() {
                         @JavascriptInterface
                         fun showRewardAds(){
                             TopOnHelper.rewardShow()
+                        }
+
+                        @JavascriptInterface
+                        fun signOut(){
+                            SPTool.putString(WXUtils.WX_OPEN_ID, "")
+                            SPTool.putString(WXUtils.APP_USER_TOKEN, "")
+                        }
+
+                        @JavascriptInterface
+                        fun updateUserInfo(){
+                            // TODO: 2020/8/4 更新头像、昵称信息
                         }
 
 

@@ -231,14 +231,8 @@ object TopOnHelper {
     const val TYPE_SPLASH = "splash"
     const val TYPE_REWARD = "reward"
     const val TYPE_INTERS = "inters"
-    fun getPlacementId(type: String, index: String = "0", callback: BaseObserver<String>) {
-        val body = HashMap<String, String>().run {
-            put("type", type)
-            put("index", index)
-            JSONObject(this as Map<*, *>).toString()
-                .toRequestBody("application/json;charset=utf-8".toMediaTypeOrNull())
-        }
-        Api.service.getPlacementId(body)
+    fun getPlacementId(callback: BaseObserver<String>, type: String, index: String = "0") {
+        Api.service.getPlacementId(type, index)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(callback)
