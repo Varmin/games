@@ -1,6 +1,7 @@
 package com.atoshi.modulebase.utils
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.view.View
 
@@ -42,4 +43,16 @@ fun isExitClickFirst(): Boolean {
         return true
     }
     return false
+}
+
+fun getVersionCode(context: Context):Int{
+    val packageName = context.packageName
+    val packageInfo = context.packageManager.getPackageInfo(packageName, 0)
+    return packageInfo.versionCode
+}
+
+fun getVersionName(context: Context):String{
+    val packageName = context.packageName
+    val packageInfo = context.packageManager.getPackageInfo(packageName, 0)
+    return packageInfo.versionName
 }

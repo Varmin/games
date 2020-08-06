@@ -4,8 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.SystemClock
 import android.view.*
-import android.webkit.JavascriptInterface
 import com.atoshi.moduleads.TopOnHelper
 import com.atoshi.modulebase.base.BaseActivity
 import com.atoshi.modulebase.net.model.TOP_ON_AD_IDS
@@ -14,7 +14,6 @@ import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.isExitClickFirst
 import com.atoshi.modulebase.wx.WXUtils
 import com.tencent.smtt.sdk.WebView
-import com.tencent.smtt.sdk.WebViewClient
 
 const val ACTION_LOAD_URL = "action_load_url"
 class GameActivity : BaseActivity() {
@@ -60,38 +59,36 @@ class GameActivity : BaseActivity() {
                 registerReceiver(this, IntentFilter(ACTION_LOAD_URL))
             }
         }
+
+        UpdateManager(this).checkVersion()
     }
     override fun onDestroy() {
         super.onDestroy()
         mReceiverReload?.apply { unregisterReceiver(this) }
+        mWebView?.destroy()
     }
 
     // TODO: by HY, 2020/7/24 WebView优化：缓存、预加载...
     private fun loadUrl() {
         val openId = SPTool.getString(WXUtils.WX_OPEN_ID)
         val token = SPTool.getString(WXUtils.APP_USER_TOKEN)
-
         mWebView?.loadUrl("http://game.atoshi.mobi/other/android?openid=$openId&token=$token")
-//      mWebView?.loadUrl("https://www.baidu.com/")
+//        mWebView?.loadUrl("https://www.baidu.com")
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            /*if(mWebView?.canGoBack()){
-                mWebView?.goBack()
-                return true
-            }else */
-            if(isExitClickFirst()){
+        if (keyCode == KeyEvent.KEYCODE_BACK && isExitClickFirst()) {
                 toast("再按一次退出应用")
                 return true
-            }
         }
         return super.onKeyDown(keyCode, event)
     }
     // TODO: by HY, 2020/7/23 界面初始化：卡在哪些时间了？如何检测？如果有初始化放在哪里合适？
     override fun initView() {
+        var start = SystemClock.currentThreadTimeMillis()
         println("---------------------------------initView")
        window.decorView.postDelayed({
+           println("GameActivity.initView: ${SystemClock.currentThreadTimeMillis() - start}")
            if (SPTool.getString(TOP_ON_AD_IDS).isNullOrEmpty()) {
                TopOnHelper.getPlacementId {
                    TopOnHelper.intersShow(this@GameActivity, 0,true,  topOnCallback)
@@ -103,63 +100,17 @@ class GameActivity : BaseActivity() {
            }
        }, 3000)
 
-
-        window.decorView.apply {
-            postDelayed({
-                mWebView = WebView(this@GameActivity).apply {
-                    layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                    )
-                    settings.javaScriptEnabled = true
-                    webViewClient = object : WebViewClient() {
-                        override fun shouldOverrideUrlLoading(
-                            webView: WebView?,
-                            url: String?
-                        ): Boolean {
-                            println("$TAG.shouldOverrideUrlLoading: $url")
-                            webView?.loadUrl(url)
-                            return true
-                        }
-                    }
-                    addJavascriptInterface(object{
-                        @JavascriptInterface
-                        fun showIntersAds(){
-                            showIntersAds(0)
-                        }
-                        @JavascriptInterface
-                        fun showIntersAds(index: Int){
-                            TopOnHelper.intersShow(this@GameActivity, index,false, topOnCallback)
-                        }
-                        @JavascriptInterface
-                        fun showRewardAds(){
-                            showRewardAds(0)
-                        }
-                        @JavascriptInterface
-                        fun showRewardAds(index: Int){
-                           TopOnHelper.rewardShow(this@GameActivity, index,false,  topOnCallback)
-                        }
-
-                        @JavascriptInterface
-                        fun signOut(){
-                            SPTool.putString(WXUtils.WX_OPEN_ID, "")
-                            SPTool.putString(WXUtils.APP_USER_TOKEN, "")
-                            runOnUiThread{
-                                toast("退出登录")
-                                finish()
-                            }
-                        }
-
-                        @JavascriptInterface
-                        fun updateUserInfo(){
-                            // TODO: 2020/8/4 更新头像、昵称信息
-                        }
-                    }, "AtoshiGame")
-                }
-                setContentView(mWebView)
-                loadUrl()
-            }, 10)
+        mWebView = WebView(this@GameActivity).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            settings.javaScriptEnabled = true
+            webViewClient = GameWebviewClient()
+            addJavascriptInterface(JsInterface(this@GameActivity, topOnCallback), "AtoshiGame")
         }
+        loadUrl()
+        setContentView(mWebView)
     }
 
 

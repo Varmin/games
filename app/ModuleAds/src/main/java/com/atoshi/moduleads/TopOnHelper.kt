@@ -120,7 +120,6 @@ object TopOnHelper {
                 }
                 if (loading || !atrAd.isAdReady) {
                     atrAd.load()
-                    callback?.error("", "广告加载中...")
                 }else{
                     atrAd.show()
                 }
@@ -145,7 +144,6 @@ object TopOnHelper {
                     }
                 if (loading || !atrAd.isAdReady) {
                     atrAd.load()
-                    callback?.error("", "广告加载中...")
                 }else{
                     atrAd.show()
                 }
@@ -245,9 +243,11 @@ object TopOnHelper {
         ATRewardVideoListener {
         //建议在此回调中调用load进行广告的加载，方便下一次广告的展示
         override fun onRewardedVideoAdClosed(p0: ATAdInfo?) {
-            println("TopOnRewardListener.onRewardedVideoAdClosed: $p0")
-            mRewardVideoAd?.load()
-            mRewardMap[placementId]?.load()
+            println("TopOnRewardListener.onRewardedVideoAdClosed: $p0, $placementId, ${mRewardMap[placementId]}")
+            /*mRewardVideoAd?.load()
+            mRewardMap[placementId]?.load()*/
+
+            callback?.success()
         }
 
         override fun onReward(p0: ATAdInfo?) {
@@ -265,6 +265,8 @@ object TopOnHelper {
 
         override fun onRewardedVideoAdPlayStart(p0: ATAdInfo?) {
             println("TopOnRewardListener.onRewardedVideoAdPlayStart: $p0")
+            mRewardVideoAd?.load()
+            mRewardMap[placementId]?.load()
         }
 
         override fun onRewardedVideoAdFailed(p0: AdError?) {
@@ -274,7 +276,7 @@ object TopOnHelper {
 
         override fun onRewardedVideoAdPlayEnd(p0: ATAdInfo?) {
             println("TopOnRewardListener.onRewardedVideoAdPlayEnd: $p0")
-            callback?.success()
+            //callback?.success()
         }
 
         override fun onRewardedVideoAdPlayClicked(p0: ATAdInfo?) {

@@ -9,6 +9,8 @@ import com.atoshi.modulebase.utils.click
 import com.atoshi.modulebase.net.Api
 import com.atoshi.modulebase.net.model.*
 import com.atoshi.modulebase.utils.SPTool
+import com.atoshi.modulebase.utils.getVersionCode
+import com.atoshi.modulebase.utils.getVersionName
 import com.atoshi.modulebase.wx.WXUtils
 import com.tencent.mm.opensdk.modelmsg.SendAuth
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -49,6 +51,7 @@ class MainActivityLogin : BaseActivity() {
             loading()
             WXUtils.login()
         }
+        tvVersion.text = "v"+getVersionName(this)
     }
 
     override fun onBackPressed() {}

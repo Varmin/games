@@ -58,5 +58,6 @@ interface ApiService {
     fun wxRegister(@Body body: RequestBody): Observable<BaseResp<UserInfo>>
     @GET("info/getAllAds")
     fun getPlacementId(): Observable<BaseResp<TopOnBean>>
-
+    @GET("info/version?os=1")
+    fun checkVersion():Observable<BaseResp<VersionInfo>>
 }
