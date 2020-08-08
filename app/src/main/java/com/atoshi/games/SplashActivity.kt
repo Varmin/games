@@ -29,7 +29,9 @@ class SplashActivity : BaseActivity() {
             checkLogin()
         } else {
             try {
-                val splash = Gson().fromJson(json, TopOnBean::class.java)?.splash
+                val topOnBean = Gson().fromJson(json, TopOnBean::class.java)
+                TopOnHelper.placementBean = topOnBean
+                val splash = topOnBean.splash
                 if(splash != null && !splash[0].isNullOrEmpty()) splashAds(splash[0]) else checkLogin()
             } catch (e: Exception) {
                 checkLogin()

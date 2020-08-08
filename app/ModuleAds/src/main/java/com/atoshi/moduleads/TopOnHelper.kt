@@ -158,6 +158,7 @@ object TopOnHelper {
         fun error(placementId: String, error: String)
     }
 
+//    onRewardedVideoAdFailed: code[ 4001 ],desc[ Return Ad is empty. ],platformCode[ 6000 ],platformMSG[ 未知错误，详细码：109512 ]
     class TopOnSplashListener(
         private val act: Activity,
         private val placementId: String,

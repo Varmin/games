@@ -12,10 +12,12 @@ import com.atoshi.modulebase.net.model.TOP_ON_AD_IDS
 import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.isExitClickFirst
+import com.atoshi.modulebase.utils.isFastClick
 import com.atoshi.modulebase.wx.WXUtils
 import com.tencent.smtt.sdk.WebView
 
 const val ACTION_LOAD_URL = "action_load_url"
+const val GAME_BASE_URL = "http://game.atoshi.mobi/other/android"
 class GameActivity : BaseActivity() {
     // TODO: by HY, 2020/7/23 EventBus
     private var mReceiverReload: ReceiverReload? = null
@@ -72,14 +74,20 @@ class GameActivity : BaseActivity() {
     private fun loadUrl() {
         val openId = SPTool.getString(WXUtils.WX_OPEN_ID)
         val token = SPTool.getString(WXUtils.APP_USER_TOKEN)
-        mWebView?.loadUrl("http://game.atoshi.mobi/other/android?openid=$openId&token=$token")
+        mWebView?.loadUrl("$GAME_BASE_URL?openid=$openId&token=$token")
 //        mWebView?.loadUrl("https://www.baidu.com")
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK && isExitClickFirst()) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if(mWebView != null && mWebView!!.canGoBack()){
+                mWebView!!.goBack()
+                return true
+            }
+            if(isExitClickFirst()){
                 toast("再按一次退出应用")
                 return true
+            }
         }
         return super.onKeyDown(keyCode, event)
     }
@@ -120,7 +128,7 @@ class GameActivity : BaseActivity() {
     }
     private fun adsShowError(errMsg: String){
         mWebView?.loadUrl("javascript:adsShowError()")
-        mWebView?.loadUrl("javascript:adsShowError(\'$errMsg\')")
+        mWebView?.loadUrl("javascript:adsShowError('$errMsg')")
     }
 }
 
