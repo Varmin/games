@@ -108,6 +108,7 @@ class GameActivity : BaseActivity() {
            }
        }, 3000)
 
+        if (BuildConfig.DEBUG) WebView.setWebContentsDebuggingEnabled(true)
         mWebView = WebView(this@GameActivity).apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,

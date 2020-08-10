@@ -8,27 +8,38 @@ import com.tencent.smtt.sdk.WebView
 import com.tencent.smtt.sdk.WebViewClient
 
 /**
+ * todo token验证？
  * http://game.atoshi.mobi/other/android/?openid=oaMf80tEUmX9jkuXwhxKLyrTM5yQ&token=OePNgUVpQboVEF8VaN4_kbU3WB5hKpwX
  * http://game.atoshi.mobi/other/android/?openid=oaMf80tEUmX9jkuXwhxKLyrTM5yQ&token=OePNgUVpQboVEF8VaN4_keBOMum5OBa4
+ * http://game.atoshi.mobi/other/android/?openid=oaMf80tEUmX9jkuXwhxKLyrTM5yQ&token=OePNgUVpQbp04K445HnBVgMxSKIX56g-
  */
 class GameWebviewClient : WebViewClient() {
     override fun shouldOverrideUrlLoading(webView: WebView?, url: String?): Boolean {
         println("GameWebviewClient.shouldOverrideUrlLoading:  ${webView?.copyBackForwardList()?.size}, $url")
 
-        url?.let {
+        /*url?.let {
             if (!url.startsWith("http")) {
                 launchApp(webView, url)
                 webGoback(webView)
                 return true
             }
+        }*/
+        url?.takeUnless {
+            url.startsWith("http")
+        }?.run {
+            launchApp(webView, this)
+            webGoback(webView)
+            return true
         }
         return super.shouldOverrideUrlLoading(webView, url)
     }
 
     override fun doUpdateVisitedHistory(webView: WebView?, url: String?, reReload: Boolean) {
         super.doUpdateVisitedHistory(webView, url, reReload)
-        url?.run {
-            if(contains("reload=true")) webView?.clearHistory()
+        url?.takeIf {
+            it.contains("reload=true")
+        }?.run {
+            webView?.clearHistory()
         }
     }
 
@@ -44,15 +55,15 @@ class GameWebviewClient : WebViewClient() {
     }
 
     private fun webGoback(webView: WebView?) {
-        webView?.run {
-            copyBackForwardList().apply {
-                for (i in (size-1) downTo 0){
-                    getItemAtIndex(i)?.url?.let {
-                        if(it.startsWith(GAME_BASE_URL)){
-                            loadUrl("$it&reload=true")
-                        }
-                    }
+        webView?.apply {
+            copyBackForwardList().run {
+                for (i in (size - 1) downTo 0) {
+                    val url = getItemAtIndex(i)?.url
+                    if(url?.startsWith(GAME_BASE_URL) == true) return@run "$url&reload=true"
                 }
+                return@run null
+            }?.run {
+                loadUrl(this)
             }
         }
     }

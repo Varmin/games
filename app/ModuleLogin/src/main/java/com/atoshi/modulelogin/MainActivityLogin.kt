@@ -23,11 +23,11 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
 const val ACTION_WX_LOGIN = "action_wx_login"
-class MainActivityLogin : BaseActivity() {
+class MainActivityLogin : BaseActivity(), IWxLogin {
     private lateinit var mWxLoginReceiver: WxLoginReceiver
 
     // TODO: by HY, 2020/7/23 EventBus
-    inner class WxLoginReceiver: BroadcastReceiver(){
+/*    inner class WxLoginReceiver: BroadcastReceiver(){
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.takeIf {
                 it.action == ACTION_WX_LOGIN && !it.getStringExtra("code").isNullOrEmpty()
@@ -35,14 +35,14 @@ class MainActivityLogin : BaseActivity() {
                 getAccessToken(getStringExtra("code")!!)
             }
         }
-    }
+    }*/
     init {
         FULL_SCREEN = true
     }
     override fun getLayoutId(): Int = R.layout.activity_main_login
 
     override fun initData() {
-        mWxLoginReceiver = WxLoginReceiver()
+        mWxLoginReceiver = WxLoginReceiver(this)
         registerReceiver(mWxLoginReceiver, IntentFilter(ACTION_WX_LOGIN))
     }
 
@@ -71,7 +71,8 @@ class MainActivityLogin : BaseActivity() {
     }
 
 
-    private fun getAccessToken(code: String) {
+
+    override fun getAccessToken(code: String) {
         println("${javaClass.simpleName}.getAccessToken: $code")
         Api.service.getAccessToken(code)
             .subscribeOn(Schedulers.io())
