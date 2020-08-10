@@ -56,54 +56,13 @@ object TopOnHelper {
         mSplashAd =
             ATSplashAd(act, container, placementId, TopOnSplashListener(act, placementId, callback))
     }
-
     fun onDestroy() {
         mSplashAd?.onDestory()
     }
 
     /**
-     * 插屏广告
+     * 插屏
      */
-    private var mInterstitialAd: ATInterstitial? = null
-    fun interstitialLoad(context: Context, placementId: String, callback: Callback?) {
-        if (mInterstitialAd == null) {
-            mInterstitialAd = ATInterstitial(context, INTER_ID_PANGLE).apply {
-                setAdListener(TopOnInterstitialListener(placementId, callback))
-                load()
-            }
-        } else {
-            if (!mInterstitialAd!!.isAdReady) mInterstitialAd!!.load()
-        }
-    }
-
-    fun interstitialShow() {
-        mInterstitialAd?.run {
-            if (isAdReady) show() else load()
-        }
-    }
-
-    /**
-     * 激励视频
-     */
-    private var mRewardVideoAd: ATRewardVideoAd? = null
-    fun rewardLoad(act: Activity, placementId: String, callback: Callback?) {
-        if (mRewardVideoAd == null) {
-            mRewardVideoAd = ATRewardVideoAd(act, placementId).apply {
-                setAdListener(TopOnRewardListener(placementId, callback))
-                load()
-            }
-        } else {
-            if (!mRewardVideoAd!!.isAdReady) mRewardVideoAd!!.load()
-        }
-    }
-
-    fun rewardShow() {
-        mRewardVideoAd?.run {
-            if (isAdReady) show() else load()
-        }
-    }
-
-
     private val mIntersMap = HashMap<String, ATInterstitial>()
     fun intersShow(act: Activity, index: Int, loading: Boolean, callback: Callback?) {
         if (placementBean == null) {
@@ -121,12 +80,15 @@ object TopOnHelper {
                 if (loading || !atrAd.isAdReady) {
                     atrAd.load()
                 }else{
-                    atrAd.show()
+                    atrAd.show(act)
                 }
             }
         }
     }
 
+    /**
+     * 激励视频
+     */
     private val mRewardMap = HashMap<String, ATRewardVideoAd>()
     fun rewardShow(act: Activity, index: Int, loading: Boolean, callback: Callback?) {
         if (placementBean == null) {
@@ -145,7 +107,7 @@ object TopOnHelper {
                 if (loading || !atrAd.isAdReady) {
                     atrAd.load()
                 }else{
-                    atrAd.show()
+                    atrAd.show(act)
                 }
             }
         }
@@ -164,8 +126,6 @@ object TopOnHelper {
         private val placementId: String,
         private val callback: Callback?
     ) : ATSplashAdListener {
-        private var mSplashLoadStartTime: Long = SystemClock.currentThreadTimeMillis()
-
         override fun onAdDismiss(p0: ATAdInfo?) {
             println("TopOnSplashListener.onAdDismiss: $p0")
             callback?.success()
@@ -191,8 +151,7 @@ object TopOnHelper {
         }
 
         override fun onAdLoaded() {
-            val splashLoadEnd = SystemClock.currentThreadTimeMillis()
-            println("TopOnSplashListener.onAdLoaded: time=${splashLoadEnd - mSplashLoadStartTime}")
+            println("TopOnSplashListener.onAdLoaded")
         }
     }
 
@@ -235,19 +194,14 @@ object TopOnHelper {
         override fun onInterstitialAdClose(p0: ATAdInfo?) {
             println("TopOnInterstitialListener.onInterstitialAdClose: $p0")
             //在此回调中调用load进行广告的加载，方便下一次广告的展示
-            mInterstitialAd?.load()
             mIntersMap[placementId]?.load()
         }
     }
 
     class TopOnRewardListener(private val placementId: String, private val callback: Callback?) :
         ATRewardVideoListener {
-        //建议在此回调中调用load进行广告的加载，方便下一次广告的展示
         override fun onRewardedVideoAdClosed(p0: ATAdInfo?) {
             println("TopOnRewardListener.onRewardedVideoAdClosed: $p0, $placementId, ${mRewardMap[placementId]}")
-            /*mRewardVideoAd?.load()
-            mRewardMap[placementId]?.load()*/
-
             callback?.success()
         }
 
@@ -266,7 +220,7 @@ object TopOnHelper {
 
         override fun onRewardedVideoAdPlayStart(p0: ATAdInfo?) {
             println("TopOnRewardListener.onRewardedVideoAdPlayStart: $p0")
-            mRewardVideoAd?.load()
+            //在此回调中调用load进行广告的加载，方便下一次广告的展示
             mRewardMap[placementId]?.load()
         }
 

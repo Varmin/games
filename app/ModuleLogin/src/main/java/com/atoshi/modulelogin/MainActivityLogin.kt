@@ -1,7 +1,5 @@
 package com.atoshi.modulelogin
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import com.atoshi.modulebase.base.BaseActivity
@@ -9,9 +7,11 @@ import com.atoshi.modulebase.utils.click
 import com.atoshi.modulebase.net.Api
 import com.atoshi.modulebase.net.model.*
 import com.atoshi.modulebase.utils.SPTool
-import com.atoshi.modulebase.utils.getVersionCode
 import com.atoshi.modulebase.utils.getVersionName
+import com.atoshi.modulebase.wx.ACTION_WX_LOGIN
+import com.atoshi.modulebase.wx.IWxLogin
 import com.atoshi.modulebase.wx.WXUtils
+import com.atoshi.modulebase.wx.WxLoginReceiver
 import com.tencent.mm.opensdk.modelmsg.SendAuth
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observer
@@ -22,20 +22,9 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
-const val ACTION_WX_LOGIN = "action_wx_login"
+
 class MainActivityLogin : BaseActivity(), IWxLogin {
     private lateinit var mWxLoginReceiver: WxLoginReceiver
-
-    // TODO: by HY, 2020/7/23 EventBus
-/*    inner class WxLoginReceiver: BroadcastReceiver(){
-        override fun onReceive(context: Context?, intent: Intent?) {
-            intent?.takeIf {
-                it.action == ACTION_WX_LOGIN && !it.getStringExtra("code").isNullOrEmpty()
-            }?.run {
-                getAccessToken(getStringExtra("code")!!)
-            }
-        }
-    }*/
     init {
         FULL_SCREEN = true
     }

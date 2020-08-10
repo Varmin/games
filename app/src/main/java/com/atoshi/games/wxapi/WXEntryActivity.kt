@@ -4,8 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.atoshi.modulebase.wx.ACTION_WX_LOGIN
 import com.atoshi.modulebase.wx.WXUtils
-import com.atoshi.modulelogin.ACTION_WX_LOGIN
 import com.tencent.mm.opensdk.constants.ConstantsAPI
 import com.tencent.mm.opensdk.modelbase.BaseReq
 import com.tencent.mm.opensdk.modelbase.BaseResp

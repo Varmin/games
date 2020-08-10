@@ -1,4 +1,4 @@
-package com.atoshi.modulelogin
+package com.atoshi.modulebase.wx
 
 /**
  * author：yang

@@ -16,17 +16,13 @@ class TopOnTestActivity : BaseActivity() {
 
 
         btnLoad.click {
-            TopOnHelper.interstitialLoad(this, TopOnHelper.INTER_ID_GDT, null)
         }
         btnShow.click {
-            TopOnHelper.interstitialShow()
         }
 
         btnLoadReward.click {
-            TopOnHelper.rewardLoad(this, TopOnHelper.REWARD_ID_GDT, null)
         }
         btnShowReward.click {
-             TopOnHelper.rewardShow()
         }
     }
 

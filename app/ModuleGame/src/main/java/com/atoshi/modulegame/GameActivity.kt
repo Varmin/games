@@ -4,34 +4,50 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.SystemClock
 import android.view.*
 import com.atoshi.moduleads.TopOnHelper
 import com.atoshi.modulebase.base.BaseActivity
-import com.atoshi.modulebase.net.model.TOP_ON_AD_IDS
+import com.atoshi.modulebase.net.Api
+import com.atoshi.modulebase.net.model.*
 import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.isExitClickFirst
-import com.atoshi.modulebase.utils.isFastClick
+import com.atoshi.modulebase.wx.ACTION_WX_LOGIN
+import com.atoshi.modulebase.wx.IWxLogin
 import com.atoshi.modulebase.wx.WXUtils
+import com.atoshi.modulebase.wx.WxLoginReceiver
 import com.tencent.smtt.sdk.WebView
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 
 const val ACTION_LOAD_URL = "action_load_url"
 const val GAME_BASE_URL = "http://game.atoshi.mobi/other/android"
-class GameActivity : BaseActivity() {
+
+class GameActivity : BaseActivity(), IWxLogin {
+    private var mUpdateReceiver: WxLoginReceiver? = null
+
     // TODO: by HY, 2020/7/23 EventBus
     private var mReceiverReload: ReceiverReload? = null
-    inner class ReceiverReload: BroadcastReceiver(){
+
+    inner class ReceiverReload : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.run {
-                if(action == ACTION_LOAD_URL) loadUrl()
+                if (action == ACTION_LOAD_URL) loadUrl()
             }
         }
     }
-    var topOnCallback = object : TopOnHelper.Callback{
+
+    var topOnCallback = object : TopOnHelper.Callback {
         override fun success() {
             println("topOnCallback.success")
-            runOnUiThread{ adsShowSuccess()}
+            runOnUiThread { adsShowSuccess() }
         }
 
         override fun error(placementId: String, error: String) {
@@ -56,18 +72,22 @@ class GameActivity : BaseActivity() {
     override fun getLayoutId(): Int = -1
 
     override fun initData() {
-        if(SPTool.getString(WXUtils.WX_OPEN_ID).isNullOrEmpty()){
+        if (SPTool.getString(WXUtils.WX_OPEN_ID).isNullOrEmpty()) {
             mReceiverReload = ReceiverReload().apply {
                 registerReceiver(this, IntentFilter(ACTION_LOAD_URL))
             }
         }
-
+        mUpdateReceiver = WxLoginReceiver(this).apply {
+            registerReceiver(this, IntentFilter(ACTION_WX_LOGIN))
+        }
         UpdateManager(this).checkVersion()
     }
+
     override fun onDestroy() {
         super.onDestroy()
-        mReceiverReload?.apply { unregisterReceiver(this) }
         mWebView?.destroy()
+        mReceiverReload?.apply { unregisterReceiver(this) }
+        mUpdateReceiver?.apply { unregisterReceiver(this) }
     }
 
     // TODO: by HY, 2020/7/24 WebView优化：缓存、预加载...
@@ -80,35 +100,38 @@ class GameActivity : BaseActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if(mWebView != null && mWebView!!.canGoBack()){
+            if (mWebView != null && mWebView!!.canGoBack()) {
                 mWebView!!.goBack()
                 return true
             }
-            if(isExitClickFirst()){
+            if (isExitClickFirst()) {
                 toast("再按一次退出应用")
                 return true
             }
         }
         return super.onKeyDown(keyCode, event)
     }
+
     // TODO: by HY, 2020/7/23 界面初始化：卡在哪些时间了？如何检测？如果有初始化放在哪里合适？
     override fun initView() {
         var start = SystemClock.currentThreadTimeMillis()
         println("---------------------------------initView")
-       window.decorView.postDelayed({
-           println("GameActivity.initView: ${SystemClock.currentThreadTimeMillis() - start}")
-           if (SPTool.getString(TOP_ON_AD_IDS).isNullOrEmpty()) {
-               TopOnHelper.getPlacementId {
-                   TopOnHelper.intersShow(this@GameActivity, 0,true,  topOnCallback)
-                   TopOnHelper.rewardShow(this@GameActivity, 0,true,  topOnCallback)
-               }
-           }else{
-               TopOnHelper.intersShow(this@GameActivity, 0,true,  topOnCallback)
-               TopOnHelper.rewardShow(this@GameActivity, 0,true,  topOnCallback)
-           }
-       }, 3000)
+        window.decorView.postDelayed({
+            println("GameActivity.initView: ${SystemClock.currentThreadTimeMillis() - start}")
+            if (SPTool.getString(TOP_ON_AD_IDS).isNullOrEmpty()) {
+                TopOnHelper.getPlacementId {
+                    TopOnHelper.intersShow(this@GameActivity, 0, true, topOnCallback)
+                    TopOnHelper.rewardShow(this@GameActivity, 0, true, topOnCallback)
+                }
+            } else {
+                TopOnHelper.intersShow(this@GameActivity, 0, true, topOnCallback)
+                TopOnHelper.rewardShow(this@GameActivity, 0, true, topOnCallback)
+            }
+        }, 3000)
 
-        if (BuildConfig.DEBUG) WebView.setWebContentsDebuggingEnabled(true)
+        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
         mWebView = WebView(this@GameActivity).apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -123,13 +146,107 @@ class GameActivity : BaseActivity() {
     }
 
 
-
-    private fun adsShowSuccess(){
-        mWebView?.loadUrl( "javascript:adsShowSuccess()")
+    private fun adsShowSuccess() {
+        println("GameActivity.adsShowSuccess: $mWebView")
+        mWebView?.loadUrl("javascript:adsShowSuccess()")
     }
-    private fun adsShowError(errMsg: String){
+
+    private fun adsShowError(errMsg: String) {
         mWebView?.loadUrl("javascript:adsShowError()")
         mWebView?.loadUrl("javascript:adsShowError('$errMsg')")
+    }
+
+
+    // TODO: yang 2020/8/10 整理
+    //--------------------------wx更新信息--------------------------
+    override fun getAccessToken(code: String) {
+        println("${javaClass.simpleName}.getAccessToken: $code")
+        Api.service.getAccessToken(code)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<WxAccessToken> {
+                override fun onSubscribe(d: Disposable?) {
+                    loading()
+                    println("${javaClass.simpleName}.onSubscribe: ")
+                }
+
+                override fun onNext(t: WxAccessToken?) {
+                    println("${javaClass.simpleName}.onNext: ${t?.openid} ")
+                    t?.apply { getUserInfo(this) }
+                }
+
+                override fun onComplete() {}
+                override fun onError(e: Throwable?) {
+                    println("${javaClass.simpleName}.onError: ${e.toString()} ")
+                    loaded()
+                }
+            })
+    }
+
+    private fun getUserInfo(wxAccessToken: WxAccessToken) {
+        println("${javaClass.simpleName}.getUserInfo: ${wxAccessToken.access_token}, ${wxAccessToken.openid}, ${wxAccessToken.scope} ")
+        Api.service.getUserInfo(wxAccessToken.access_token!!, wxAccessToken.openid!!)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<WxUserInfo> {
+                override fun onSubscribe(d: Disposable?) {
+                    println("${javaClass.simpleName}.onSubscribe: ")
+                }
+
+                override fun onNext(info: WxUserInfo?) {
+                    info?.apply {
+                        println("${javaClass.simpleName}.onNext: $nickname, $headimgurl ")
+                        updateInfo(info)
+                    }
+                }
+
+                override fun onError(e: Throwable?) {
+                    println("${javaClass.simpleName}.onError: ${e.toString()} ")
+                    loaded()
+                }
+
+                override fun onComplete() {
+                    println("${javaClass.simpleName}.onComplete: ")
+                }
+            })
+    }
+
+    private fun updateInfo(info: WxUserInfo) {
+        var body = HashMap<String, String>().apply {
+            put("city", info.city)
+            put("country", info.country)
+            put("headimgurl", info.headimgurl)
+            put("nickname", info.nickname)
+            put("openid", info.openid)
+            put("province", info.province)
+            put("sex", info.sex.toString())
+            put("unionid", info.unionid)
+        }.let {
+            JSONObject(it as Map<*, *>).toString()
+                .toRequestBody("application/json;charset=utf-8".toMediaTypeOrNull())
+        }
+        Api.service.update(body)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : BaseObserver<String>() {
+                override fun onSuccess(data: String) {
+                    println("${javaClass.simpleName}.onSuccess: $data ")
+                    loaded()
+                    loadUpdate(info.nickname, info.headimgurl)
+                }
+
+                override fun onError(code: Int, errMsg: String) {
+                    super.onError(code, errMsg)
+                    loaded()
+                }
+            })
+    }
+
+    /**
+     * 更新信息
+     */
+    private fun loadUpdate(nickname: String, headimgurl: String) {
+        mWebView?.loadUrl("javascript:updateInfo('$nickname', '$headimgurl')")
     }
 }
 

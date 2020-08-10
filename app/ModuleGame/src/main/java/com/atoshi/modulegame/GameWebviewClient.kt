@@ -1,6 +1,5 @@
 package com.atoshi.modulegame
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -16,14 +15,6 @@ import com.tencent.smtt.sdk.WebViewClient
 class GameWebviewClient : WebViewClient() {
     override fun shouldOverrideUrlLoading(webView: WebView?, url: String?): Boolean {
         println("GameWebviewClient.shouldOverrideUrlLoading:  ${webView?.copyBackForwardList()?.size}, $url")
-
-        /*url?.let {
-            if (!url.startsWith("http")) {
-                launchApp(webView, url)
-                webGoback(webView)
-                return true
-            }
-        }*/
         url?.takeUnless {
             url.startsWith("http")
         }?.run {

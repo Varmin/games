@@ -60,4 +60,6 @@ interface ApiService {
     fun getPlacementId(): Observable<BaseResp<TopOnBean>>
     @GET("info/version?os=1")
     fun checkVersion():Observable<BaseResp<VersionInfo>>
+    @POST("userLogin/update")
+    fun update(@Body body: RequestBody): Observable<BaseResp<String>>
 }
