@@ -4,11 +4,11 @@ package com.atoshi.modulebase.net.model
  * created by HYY on 2020/7/16
  * description:
  */
-class WxAccessToken {
-    var access_token: String? = null
-    var expires_in: String? = null
-    var refresh_token: String? = null
-    var openid: String? = null
-    var scope: String? = null
-    var unionid: String? = null
-}
+data class WxAccessToken(
+    val access_token: String,
+    val expires_in: String,
+    val refresh_token: String,
+    val openid: String,
+    val scope: String,
+    val unionid: String
+)

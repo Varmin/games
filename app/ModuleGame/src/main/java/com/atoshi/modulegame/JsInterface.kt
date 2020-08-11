@@ -2,12 +2,12 @@ package com.atoshi.modulegame
 
 import android.webkit.JavascriptInterface
 import com.atoshi.moduleads.TopOnHelper
-import com.atoshi.modulebase.base.BaseActivity
 import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.startPath
+import com.atoshi.modulebase.wx.IWxLogin
 import com.atoshi.modulebase.wx.WXUtils
 
-class JsInterface(private val act: BaseActivity, private val callback: TopOnHelper.Callback?) {
+class JsInterface(private val act: GameActivity, private val callback: TopOnHelper.Callback?) {
     @JavascriptInterface
     fun showIntersAds(){
         showIntersAds(0)
@@ -39,6 +39,13 @@ class JsInterface(private val act: BaseActivity, private val callback: TopOnHelp
 
     @JavascriptInterface
     fun updateUserInfo(){
-        WXUtils.login()
+        SPTool.getString(WXUtils.WX_REFRESH_ACCESS_TOKEN).takeIf {
+            println("JsInterface.updateUserInfo: $it")
+            !it.isNullOrEmpty()
+        }?.run {
+            act.runOnUiThread {
+                (act as? IWxLogin)?.getAccessToken(this)
+            }
+        }
     }
 }

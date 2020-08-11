@@ -13,5 +13,6 @@ data class WxUserInfo (
     var privilege:  MutableList<String> = ArrayList(),
     var province: String = "",
     var sex: Int = 0,
-    var unionid: String = ""
+    var unionid: String = "",
+    val token: String = ""
 )

@@ -20,6 +20,8 @@ object WXUtils {
     private const val WX_REQ_STATE = "wechat_sdk_demo_test"
     //保存sp值的key
     const val WX_OPEN_ID = "wx_open_id"
+    const val WX_ACCESS_TOKEN = "wx_access_token"
+    const val WX_REFRESH_ACCESS_TOKEN = "wx_refresh_access_token"
     const val APP_USER_TOKEN = "app_user_token"
 
     private lateinit var mWxApi: IWXAPI
@@ -41,7 +43,7 @@ object WXUtils {
                 scope = WX_REQ_SCOPE
                 state = WX_REQ_STATE
             }).let {
-                println("WxUtils.login: $it")
+                println("WxUtils.login, sendReq: $it")
             }
         } else {
             Toast.makeText(mContext, "您还未安装微信客户端！", Toast.LENGTH_LONG).show()

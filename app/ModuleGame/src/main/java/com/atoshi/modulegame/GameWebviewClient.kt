@@ -8,9 +8,7 @@ import com.tencent.smtt.sdk.WebViewClient
 
 /**
  * todo token验证？
- * http://game.atoshi.mobi/other/android/?openid=oaMf80tEUmX9jkuXwhxKLyrTM5yQ&token=OePNgUVpQboVEF8VaN4_kbU3WB5hKpwX
- * http://game.atoshi.mobi/other/android/?openid=oaMf80tEUmX9jkuXwhxKLyrTM5yQ&token=OePNgUVpQboVEF8VaN4_keBOMum5OBa4
- * http://game.atoshi.mobi/other/android/?openid=oaMf80tEUmX9jkuXwhxKLyrTM5yQ&token=OePNgUVpQbp04K445HnBVgMxSKIX56g-
+ * http://game.atoshi.mobi/other/android/?openid=oaMf80tEUmX9jkuXwhxKLyrTM5yQ&token=qyMoRbcw_-d04K445HnBVihnTq4F5ppb
  */
 class GameWebviewClient : WebViewClient() {
     override fun shouldOverrideUrlLoading(webView: WebView?, url: String?): Boolean {

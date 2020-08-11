@@ -31,14 +31,14 @@ class MainActivityLogin : BaseActivity(), IWxLogin {
     override fun getLayoutId(): Int = R.layout.activity_main_login
 
     override fun initData() {
-        mWxLoginReceiver = WxLoginReceiver(this)
+        mWxLoginReceiver = WxLoginReceiver(this, ACTION_WX_LOGIN)
         registerReceiver(mWxLoginReceiver, IntentFilter(ACTION_WX_LOGIN))
     }
 
     override fun initView() {
         tvLogin.click {
             loading()
-            WXUtils.login()
+            runOnUiThread { WXUtils.login() }
         }
         tvVersion.text = "v"+getVersionName(this)
     }
@@ -73,8 +73,13 @@ class MainActivityLogin : BaseActivity(), IWxLogin {
                 }
 
                 override fun onNext(t: WxAccessToken?) {
-                    println("${javaClass.simpleName}.onNext: ${t?.openid} ")
-                    t?.apply { wxLogin(this) }
+                    println("${javaClass.simpleName}.onNext: getAccessToken: $t ")
+
+                    t?.apply {
+                        wxLogin(this)
+                        SPTool.putString(WXUtils.WX_ACCESS_TOKEN, t.access_token)
+                        SPTool.putString(WXUtils.WX_REFRESH_ACCESS_TOKEN, t.refresh_token)
+                    }
                 }
 
                 override fun onComplete() {loaded()}

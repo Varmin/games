@@ -14,10 +14,7 @@ import com.atoshi.modulebase.net.model.*
 import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.isExitClickFirst
-import com.atoshi.modulebase.wx.ACTION_WX_LOGIN
-import com.atoshi.modulebase.wx.IWxLogin
-import com.atoshi.modulebase.wx.WXUtils
-import com.atoshi.modulebase.wx.WxLoginReceiver
+import com.atoshi.modulebase.wx.*
 import com.tencent.smtt.sdk.WebView
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observer
@@ -77,7 +74,7 @@ class GameActivity : BaseActivity(), IWxLogin {
                 registerReceiver(this, IntentFilter(ACTION_LOAD_URL))
             }
         }
-        mUpdateReceiver = WxLoginReceiver(this).apply {
+        mUpdateReceiver = WxLoginReceiver(this, ACTION_WX_REFRESH).apply {
             registerReceiver(this, IntentFilter(ACTION_WX_LOGIN))
         }
         UpdateManager(this).checkVersion()
@@ -85,6 +82,7 @@ class GameActivity : BaseActivity(), IWxLogin {
 
     override fun onDestroy() {
         super.onDestroy()
+        // TODO: yang 2020/8/11 android.permission.READ_PHONE_STATE
         mWebView?.destroy()
         mReceiverReload?.apply { unregisterReceiver(this) }
         mUpdateReceiver?.apply { unregisterReceiver(this) }
@@ -147,7 +145,6 @@ class GameActivity : BaseActivity(), IWxLogin {
 
 
     private fun adsShowSuccess() {
-        println("GameActivity.adsShowSuccess: $mWebView")
         mWebView?.loadUrl("javascript:adsShowSuccess()")
     }
 
@@ -160,8 +157,8 @@ class GameActivity : BaseActivity(), IWxLogin {
     // TODO: yang 2020/8/10 整理
     //--------------------------wx更新信息--------------------------
     override fun getAccessToken(code: String) {
-        println("${javaClass.simpleName}.getAccessToken: $code")
-        Api.service.getAccessToken(code)
+        println("${javaClass.simpleName}.getAccessToken: $code, ${Thread.currentThread().name}")
+        Api.service.refreshAccessToken(code)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : Observer<WxAccessToken> {
@@ -171,12 +168,17 @@ class GameActivity : BaseActivity(), IWxLogin {
                 }
 
                 override fun onNext(t: WxAccessToken?) {
-                    println("${javaClass.simpleName}.onNext: ${t?.openid} ")
-                    t?.apply { getUserInfo(this) }
+                    println("${javaClass.simpleName}.onNext: refreshAccessToken: $t ")
+                    t?.apply {
+                        getUserInfo(this)
+                        SPTool.putString(WXUtils.WX_ACCESS_TOKEN, t.access_token)
+                        SPTool.putString(WXUtils.WX_REFRESH_ACCESS_TOKEN, t.refresh_token)
+                    }
                 }
 
                 override fun onComplete() {}
                 override fun onError(e: Throwable?) {
+                    //todo refresh_access失效后，需要重新登陆，40030
                     println("${javaClass.simpleName}.onError: ${e.toString()} ")
                     loaded()
                 }
@@ -225,13 +227,16 @@ class GameActivity : BaseActivity(), IWxLogin {
             JSONObject(it as Map<*, *>).toString()
                 .toRequestBody("application/json;charset=utf-8".toMediaTypeOrNull())
         }
-        Api.service.update(body)
+
+        println("GameActivity.updateInfo: token: "+SPTool.getString(WXUtils.APP_USER_TOKEN))
+        Api.service.update(SPTool.getString(WXUtils.APP_USER_TOKEN), body)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : BaseObserver<String>() {
-                override fun onSuccess(data: String) {
+            .subscribe(object : BaseObserver<UserInfo>() {
+                override fun onSuccess(data: UserInfo) {
                     println("${javaClass.simpleName}.onSuccess: $data ")
                     loaded()
+                    SPTool.putString(WXUtils.APP_USER_TOKEN, data.token)
                     loadUpdate(info.nickname, info.headimgurl)
                 }
 
@@ -246,6 +251,7 @@ class GameActivity : BaseActivity(), IWxLogin {
      * 更新信息
      */
     private fun loadUpdate(nickname: String, headimgurl: String) {
+        println("GameActivity.loadUpdate：javascript:updateInfo('$nickname', '$headimgurl')")
         mWebView?.loadUrl("javascript:updateInfo('$nickname', '$headimgurl')")
     }
 }

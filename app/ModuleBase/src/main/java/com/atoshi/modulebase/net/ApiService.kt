@@ -45,6 +45,13 @@ interface ApiService {
         @Query("secret") secret: String = WXUtils.WX_SECRET
     ): Observable<WxAccessToken>
 
+    @GET("https://api.weixin.qq.com/sns/oauth2/refresh_token?grant_type=refresh_token")
+    fun refreshAccessToken(
+        @Query("refresh_token") respCode: String,
+        @Query("appid") appid: String = WXUtils.WX_APP_ID
+    ): Observable<WxAccessToken>
+
+
     @GET("https://api.weixin.qq.com/sns/userinfo")
     fun getUserInfo(
         @Query("access_token") accessToken: String,
@@ -61,5 +68,5 @@ interface ApiService {
     @GET("info/version?os=1")
     fun checkVersion():Observable<BaseResp<VersionInfo>>
     @POST("userLogin/update")
-    fun update(@Body body: RequestBody): Observable<BaseResp<String>>
+    fun update(@Header("token") token:String, @Body body: RequestBody): Observable<BaseResp<UserInfo>>
 }

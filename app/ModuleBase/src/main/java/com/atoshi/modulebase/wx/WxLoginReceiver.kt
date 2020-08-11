@@ -10,10 +10,11 @@ import android.content.Intent
  * description:
  */
 const val ACTION_WX_LOGIN = "action_wx_login"
-class WxLoginReceiver(private val login: IWxLogin): BroadcastReceiver() {
+const val ACTION_WX_REFRESH = "action_wx_refresh"
+class WxLoginReceiver(private val login: IWxLogin, private val action: String): BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         intent?.takeIf {
-            it.action == ACTION_WX_LOGIN && !it.getStringExtra("code").isNullOrEmpty()
+            it.action == action && !it.getStringExtra("code").isNullOrEmpty()
         }?.run {
             login?.getAccessToken(getStringExtra("code")!!)
         }
