@@ -33,10 +33,11 @@ class GameActivity : BaseActivity(), IWxLogin {
     // TODO: by HY, 2020/7/23 EventBus
     private var mReceiverReload: ReceiverReload? = null
 
+
     inner class ReceiverReload : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.run {
-                if (action == ACTION_LOAD_URL) loadUrl()
+                if (action == ACTION_LOAD_URL) loadUrl(true)
             }
         }
     }
@@ -69,10 +70,8 @@ class GameActivity : BaseActivity(), IWxLogin {
     override fun getLayoutId(): Int = -1
 
     override fun initData() {
-        if (SPTool.getString(WXUtils.WX_OPEN_ID).isNullOrEmpty()) {
-            mReceiverReload = ReceiverReload().apply {
-                registerReceiver(this, IntentFilter(ACTION_LOAD_URL))
-            }
+        mReceiverReload = ReceiverReload().apply {
+            registerReceiver(this, IntentFilter(ACTION_LOAD_URL))
         }
         mUpdateReceiver = WxLoginReceiver(this, ACTION_WX_REFRESH).apply {
             registerReceiver(this, IntentFilter(ACTION_WX_LOGIN))
@@ -89,10 +88,11 @@ class GameActivity : BaseActivity(), IWxLogin {
     }
 
     // TODO: by HY, 2020/7/24 WebView优化：缓存、预加载...
-    private fun loadUrl() {
+    private fun loadUrl(reload: Boolean = false) {
         val openId = SPTool.getString(WXUtils.WX_OPEN_ID)
         val token = SPTool.getString(WXUtils.APP_USER_TOKEN)
-        mWebView?.loadUrl("$GAME_BASE_URL?openid=$openId&token=$token")
+        val tag = if(reload) "&reload=true" else ""
+        mWebView?.loadUrl("$GAME_BASE_URL?openid=$openId&token=$token$tag")
 //        mWebView?.loadUrl("https://www.baidu.com")
     }
 
