@@ -24,24 +24,7 @@ class SplashActivity : BaseActivity() {
     override fun initData() {}
 
     override fun initView() {
-        val json = SPTool.getString(TOP_ON_AD_IDS)
-        if (json.isNullOrEmpty()) {
-            checkLogin()
-        } else {
-            try {
-                val topOnBean = Gson().fromJson(json, TopOnBean::class.java)
-                TopOnHelper.placementBean = topOnBean
-                val splash = topOnBean.splash
-                if(splash != null && !splash[0].isNullOrEmpty()) splashAds(splash[0]) else checkLogin()
-            } catch (e: Exception) {
-                checkLogin()
-            }
-        }
-        TopOnHelper.getPlacementId()
-    }
-
-    private fun splashAds(placementId: String) {
-        TopOnHelper.splashAds(flAdsContainer, placementId, object : TopOnHelper.Callback {
+        TopOnHelper.splashAds(flAdsContainer, object : TopOnHelper.ListenerCallback {
             override fun success() {
                 checkLogin()
             }
@@ -49,7 +32,9 @@ class SplashActivity : BaseActivity() {
                 checkLogin()
             }
         })
+        TopOnHelper.getPlacementIdApi(null)
     }
+
 
 
     fun checkLogin() {

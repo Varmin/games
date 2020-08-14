@@ -28,12 +28,13 @@ const val ACTION_LOAD_URL = "action_load_url"
 const val GAME_BASE_URL = "http://game.atoshi.mobi/other/android"
 
 class GameActivity : BaseActivity(), IWxLogin {
+    init {
+        FULL_SCREEN = true
+    }
+    private var mWebView: WebView? = null
     private var mUpdateReceiver: WxLoginReceiver? = null
-
     // TODO: by HY, 2020/7/23 EventBus
     private var mReceiverReload: ReceiverReload? = null
-
-
     inner class ReceiverReload : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.run {
@@ -42,7 +43,7 @@ class GameActivity : BaseActivity(), IWxLogin {
         }
     }
 
-    var topOnCallback = object : TopOnHelper.Callback {
+    var topOnCallback = object : TopOnHelper.ListenerCallback {
         override fun success() {
             println("topOnCallback.success")
             runOnUiThread { adsShowSuccess() }
@@ -54,16 +55,12 @@ class GameActivity : BaseActivity(), IWxLogin {
         }
     }
 
-    init {
-        FULL_SCREEN = true
-    }
-
-    private var mWebView: WebView? = null
-
     // TODO: by HY, 2020/7/23 声明周期， 在Activity生成但未显示的时候跳转：有没有更早的？
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         // TODO: by HY, 2020/7/23 过渡动画
+
+//        startPath("com.atoshi.moduleads.TopOnTestActivity")
         startPath("com.atoshi.games.SplashActivity")
     }
 
@@ -87,15 +84,6 @@ class GameActivity : BaseActivity(), IWxLogin {
         mUpdateReceiver?.apply { unregisterReceiver(this) }
     }
 
-    // TODO: by HY, 2020/7/24 WebView优化：缓存、预加载...
-    private fun loadUrl(reload: Boolean = false) {
-        val openId = SPTool.getString(WXUtils.WX_OPEN_ID)
-        val token = SPTool.getString(WXUtils.APP_USER_TOKEN)
-        val tag = if(reload) "&reload=true" else ""
-        mWebView?.loadUrl("$GAME_BASE_URL?openid=$openId&token=$token$tag")
-//        mWebView?.loadUrl("https://www.baidu.com")
-    }
-
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (mWebView != null && mWebView!!.canGoBack()) {
@@ -112,20 +100,9 @@ class GameActivity : BaseActivity(), IWxLogin {
 
     // TODO: by HY, 2020/7/23 界面初始化：卡在哪些时间了？如何检测？如果有初始化放在哪里合适？
     override fun initView() {
-        var start = SystemClock.currentThreadTimeMillis()
         println("---------------------------------initView")
-        window.decorView.postDelayed({
-            println("GameActivity.initView: ${SystemClock.currentThreadTimeMillis() - start}")
-            if (SPTool.getString(TOP_ON_AD_IDS).isNullOrEmpty()) {
-                TopOnHelper.getPlacementId {
-                    TopOnHelper.intersShow(this@GameActivity, 0, true, topOnCallback)
-                    TopOnHelper.rewardShow(this@GameActivity, 0, true, topOnCallback)
-                }
-            } else {
-                TopOnHelper.intersShow(this@GameActivity, 0, true, topOnCallback)
-                TopOnHelper.rewardShow(this@GameActivity, 0, true, topOnCallback)
-            }
-        }, 3000)
+        TopOnHelper.intersShow(this@GameActivity, 0, true, topOnCallback)
+        TopOnHelper.rewardShow(this@GameActivity, 0, true, topOnCallback)
 
         if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
@@ -143,6 +120,14 @@ class GameActivity : BaseActivity(), IWxLogin {
         setContentView(mWebView)
     }
 
+    // TODO: by HY, 2020/7/24 WebView优化：缓存、预加载...
+    private fun loadUrl(reload: Boolean = false) {
+        val openId = SPTool.getString(WXUtils.WX_OPEN_ID)
+        val token = SPTool.getString(WXUtils.APP_USER_TOKEN)
+        val tag = if(reload) "&reload=true" else ""
+        mWebView?.loadUrl("$GAME_BASE_URL?openid=$openId&token=$token$tag")
+        //mWebView?.loadUrl("https://www.baidu.com")
+    }
 
     private fun adsShowSuccess() {
         mWebView?.loadUrl("javascript:adsShowSuccess()")
@@ -153,6 +138,13 @@ class GameActivity : BaseActivity(), IWxLogin {
         mWebView?.loadUrl("javascript:adsShowError('$errMsg')")
     }
 
+    /**
+     * 更新信息
+     */
+    private fun loadUpdate(nickname: String, headimgurl: String) {
+        println("GameActivity.loadUpdate：javascript:updateInfo('$nickname', '$headimgurl')")
+        mWebView?.loadUrl("javascript:updateInfo('$nickname', '$headimgurl')")
+    }
 
     // TODO: yang 2020/8/10 整理
     //--------------------------wx更新信息--------------------------
@@ -247,12 +239,6 @@ class GameActivity : BaseActivity(), IWxLogin {
             })
     }
 
-    /**
-     * 更新信息
-     */
-    private fun loadUpdate(nickname: String, headimgurl: String) {
-        println("GameActivity.loadUpdate：javascript:updateInfo('$nickname', '$headimgurl')")
-        mWebView?.loadUrl("javascript:updateInfo('$nickname', '$headimgurl')")
-    }
+
 }
 

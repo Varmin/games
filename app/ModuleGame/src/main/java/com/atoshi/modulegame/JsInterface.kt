@@ -7,7 +7,7 @@ import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.wx.IWxLogin
 import com.atoshi.modulebase.wx.WXUtils
 
-class JsInterface(private val act: GameActivity, private val callback: TopOnHelper.Callback?) {
+class JsInterface(private val act: GameActivity, private val callback: TopOnHelper.ListenerCallback?) {
     @JavascriptInterface
     fun showIntersAds(){
         showIntersAds(0)
