@@ -81,8 +81,8 @@ object TopOnHelper {
                     var atrAd = mIntersMap[placementId] ?: TopOnIntersAd(act, placementId, listenerCallback).apply {
                         mIntersMap[placementId] = this
                     }
-                    if(loading && !atrAd.isAdReady){
-                        atrAd.load()
+                    if(loading){
+                        if(!atrAd.isAdReady) atrAd.load()
                     }else{
                         atrAd.forceShow()
                     }
@@ -108,8 +108,8 @@ object TopOnHelper {
                         ?: TopOnRewardAd(act, placementId, listenerCallback).apply {
                             mRewardMap[placementId] = this
                         }
-                    if(loading && !atrAd.isAdReady){
-                        atrAd.load()
+                    if(loading){
+                        if(!atrAd.isAdReady) atrAd.load()
                     }else{
                         atrAd.forceShow()
                     }
@@ -184,6 +184,7 @@ object TopOnHelper {
             if (mForceCallback != null) {
                 mForceCallback?.invoke()
                 mForceCallback = null
+                println("TopOnInterstitialListener.onInterstitialAdLoaded: force set null")
             }
         }
 
@@ -263,6 +264,7 @@ object TopOnHelper {
             if (mForceCallback != null) {
                 mForceCallback?.invoke()
                 mForceCallback = null
+                println("TopOnRewardListener.onRewardedVideoAdLoaded: force set null")
             }
         }
 

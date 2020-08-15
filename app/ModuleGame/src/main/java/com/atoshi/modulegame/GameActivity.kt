@@ -101,8 +101,6 @@ class GameActivity : BaseActivity(), IWxLogin {
     // TODO: by HY, 2020/7/23 界面初始化：卡在哪些时间了？如何检测？如果有初始化放在哪里合适？
     override fun initView() {
         println("---------------------------------initView")
-        TopOnHelper.intersShow(this@GameActivity, 0, true, topOnCallback)
-        TopOnHelper.rewardShow(this@GameActivity, 0, true, topOnCallback)
 
         if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
@@ -118,6 +116,13 @@ class GameActivity : BaseActivity(), IWxLogin {
         }
         loadUrl()
         setContentView(mWebView)
+
+        // TODO: yang 2020/8/15 精确控制显示，而不是延迟
+        // 不与Splash抢占加载资源
+        mWebView?.postDelayed({
+            TopOnHelper.intersShow(this@GameActivity, 0, true, topOnCallback)
+            TopOnHelper.rewardShow(this@GameActivity, 0, true, topOnCallback)
+        }, 2000)
     }
 
     // TODO: by HY, 2020/7/24 WebView优化：缓存、预加载...

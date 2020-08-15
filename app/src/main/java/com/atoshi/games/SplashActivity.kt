@@ -24,15 +24,24 @@ class SplashActivity : BaseActivity() {
     override fun initData() {}
 
     override fun initView() {
-        TopOnHelper.splashAds(flAdsContainer, object : TopOnHelper.ListenerCallback {
-            override fun success() {
-                checkLogin()
-            }
-            override fun error(placementId: String, error: String) {
-                checkLogin()
-            }
-        })
+        //上面有可能拿的是sp中的值，这里更新一下
         TopOnHelper.getPlacementIdApi(null)
+
+        //先把Activity显示出来，再加载，否则卡顿
+        //todo 确切显示回调？而不是延迟；  如何预加载
+        flAdsContainer.postDelayed({
+            println("SplashActivity.initView--delay")
+            TopOnHelper.splashAds(flAdsContainer, object : TopOnHelper.ListenerCallback {
+                override fun success() {
+                    println("SplashActivity.success")
+                    checkLogin()
+                }
+                override fun error(placementId: String, error: String) {
+                    println("SplashActivity.error: $error")
+                    checkLogin()
+                }
+            })
+        }, 100)
     }
 
 
