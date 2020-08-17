@@ -164,6 +164,7 @@ object TopOnHelper {
         }
 
         fun forceShow(){
+            println("TopOnIntersAd.forceShow isAdReady: $isAdReady")
             if (isAdReady) {
                 show()
             }else{
@@ -230,6 +231,7 @@ object TopOnHelper {
         }
 
         fun forceShow(){
+            println("TopOnRewardAd.forceShow isAdReady: $isAdReady")
             if (isAdReady) {
                 show()
             }else{

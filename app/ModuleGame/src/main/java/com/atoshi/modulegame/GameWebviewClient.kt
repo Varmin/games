@@ -1,6 +1,7 @@
 package com.atoshi.modulegame
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.widget.Toast
 import com.tencent.smtt.sdk.WebView
@@ -55,5 +56,15 @@ class GameWebviewClient : WebViewClient() {
                 loadUrl(this)
             }
         }
+    }
+
+    override fun onPageStarted(p0: WebView?, p1: String?, p2: Bitmap?) {
+        super.onPageStarted(p0, p1, p2)
+        println("GameWebviewClient.onPageStarted: $p1")
+    }
+
+    override fun onPageFinished(p0: WebView?, p1: String?) {
+        super.onPageFinished(p0, p1)
+        println("GameWebviewClient.onPageFinished: $p1")
     }
 }

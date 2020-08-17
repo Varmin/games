@@ -18,6 +18,17 @@ class App : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
 
+        init()
+        Thread {
+            initFromThread()
+        }.start()
+    }
+
+    private fun init() {
+
+    }
+
+    private fun initFromThread() {
         SPTool.init(this)
         WXUtils.registerApp(this)
 
@@ -37,6 +48,7 @@ class App : MultiDexApplication() {
                 override fun onSuccess() {
                     println("App.onSuccess")
                 }
+
                 override fun onFail(fail: String?) {
                     println("App.onFail: $fail")
                 }

@@ -1,19 +1,25 @@
 package com.atoshi.modulegame
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.Build
-import android.os.SystemClock
-import android.view.*
+import android.view.KeyEvent
+import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
 import com.atoshi.moduleads.TopOnHelper
 import com.atoshi.modulebase.base.BaseActivity
 import com.atoshi.modulebase.net.Api
-import com.atoshi.modulebase.net.model.*
-import com.atoshi.modulebase.utils.startPath
+import com.atoshi.modulebase.net.model.BaseObserver
+import com.atoshi.modulebase.net.model.UserInfo
+import com.atoshi.modulebase.net.model.WxAccessToken
+import com.atoshi.modulebase.net.model.WxUserInfo
 import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.isExitClickFirst
+import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.wx.*
 import com.tencent.smtt.sdk.WebView
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -25,20 +31,32 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
 const val ACTION_LOAD_URL = "action_load_url"
+const val ACTION_LOAD_ADS = "action_load_ads"
 const val GAME_BASE_URL = "http://game.atoshi.mobi/other/android"
 
 class GameActivity : BaseActivity(), IWxLogin {
     init {
         FULL_SCREEN = true
     }
+
     private var mWebView: WebView? = null
     private var mUpdateReceiver: WxLoginReceiver? = null
     // TODO: by HY, 2020/7/23 EventBus
     private var mReceiverReload: ReceiverReload? = null
+
+    private val permissions = arrayListOf(Manifest.permission.READ_PHONE_STATE)
+    private val CODE_PERMISSION_REQUEST = 1101
+
     inner class ReceiverReload : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.run {
                 if (action == ACTION_LOAD_URL) loadUrl(true)
+                if (action == ACTION_LOAD_ADS) {
+                    Thread {
+                        TopOnHelper.intersShow(this@GameActivity, 0, true, topOnCallback)
+                        TopOnHelper.rewardShow(this@GameActivity, 0, true, topOnCallback)
+                    }.start()
+                }
             }
         }
     }
@@ -68,7 +86,10 @@ class GameActivity : BaseActivity(), IWxLogin {
 
     override fun initData() {
         mReceiverReload = ReceiverReload().apply {
-            registerReceiver(this, IntentFilter(ACTION_LOAD_URL))
+            registerReceiver(this, IntentFilter().apply {
+                addAction(ACTION_LOAD_URL)
+                addAction(ACTION_LOAD_ADS)
+            })
         }
         mUpdateReceiver = WxLoginReceiver(this, ACTION_WX_REFRESH).apply {
             registerReceiver(this, IntentFilter(ACTION_WX_LOGIN))
@@ -102,36 +123,38 @@ class GameActivity : BaseActivity(), IWxLogin {
     override fun initView() {
         println("---------------------------------initView")
 
-        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            WebView.setWebContentsDebuggingEnabled(true);
-        }
-        mWebView = WebView(this@GameActivity).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            settings.javaScriptEnabled = true
-            webViewClient = GameWebviewClient()
-            addJavascriptInterface(JsInterface(this@GameActivity, topOnCallback), "AtoshiGame")
-        }
-        loadUrl()
-        setContentView(mWebView)
+        window.decorView.postDelayed({
+            if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                WebView.setWebContentsDebuggingEnabled(true);
+            }
+            mWebView = WebView(this@GameActivity).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+                settings.javaScriptEnabled = true
+                webViewClient = GameWebviewClient()
+                addJavascriptInterface(JsInterface(this@GameActivity, topOnCallback), "AtoshiGame")
+            }
+            setContentView(mWebView)
+            loadUrl()
+        }, 1000)
 
-        // TODO: yang 2020/8/15 精确控制显示，而不是延迟
-        // 不与Splash抢占加载资源
-        mWebView?.postDelayed({
-            TopOnHelper.intersShow(this@GameActivity, 0, true, topOnCallback)
-            TopOnHelper.rewardShow(this@GameActivity, 0, true, topOnCallback)
-        }, 2000)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            println("GameActivity.onResume: ${ActivityCompat.checkSelfPermission(this, permissions[0])}, ${shouldShowRequestPermissionRationale(permissions[0])}")
+            if (ActivityCompat.checkSelfPermission(this, permissions[0]) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, permissions.toTypedArray(), CODE_PERMISSION_REQUEST)
+            }
+        }
     }
 
     // TODO: by HY, 2020/7/24 WebView优化：缓存、预加载...
     private fun loadUrl(reload: Boolean = false) {
         val openId = SPTool.getString(WXUtils.WX_OPEN_ID)
         val token = SPTool.getString(WXUtils.APP_USER_TOKEN)
-        val tag = if(reload) "&reload=true" else ""
+        val tag = if (reload) "&reload=true" else ""
         mWebView?.loadUrl("$GAME_BASE_URL?openid=$openId&token=$token$tag")
-        //mWebView?.loadUrl("https://www.baidu.com")
+//        mWebView?.loadUrl("https://www.baidu.com")
     }
 
     private fun adsShowSuccess() {
@@ -225,7 +248,7 @@ class GameActivity : BaseActivity(), IWxLogin {
                 .toRequestBody("application/json;charset=utf-8".toMediaTypeOrNull())
         }
 
-        println("GameActivity.updateInfo: token: "+SPTool.getString(WXUtils.APP_USER_TOKEN))
+        println("GameActivity.updateInfo: token: " + SPTool.getString(WXUtils.APP_USER_TOKEN))
         Api.service.update(SPTool.getString(WXUtils.APP_USER_TOKEN), body)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -243,7 +266,5 @@ class GameActivity : BaseActivity(), IWxLogin {
                 }
             })
     }
-
-
 }
 
