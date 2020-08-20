@@ -31,7 +31,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
 const val ACTION_LOAD_URL = "action_load_url"
-const val ACTION_LOAD_ADS = "action_load_ads"
+const val ACTION_PRELOAD_ADS = "action_preload_ads"
 const val GAME_BASE_URL = "http://game.atoshi.mobi/other/android"
 
 class GameActivity : BaseActivity(), IWxLogin {
@@ -41,6 +41,7 @@ class GameActivity : BaseActivity(), IWxLogin {
 
     private var mWebView: WebView? = null
     private var mUpdateReceiver: WxLoginReceiver? = null
+
     // TODO: by HY, 2020/7/23 EventBus
     private var mReceiverReload: ReceiverReload? = null
 
@@ -51,11 +52,9 @@ class GameActivity : BaseActivity(), IWxLogin {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.run {
                 if (action == ACTION_LOAD_URL) loadUrl(true)
-                if (action == ACTION_LOAD_ADS) {
-                    Thread {
-                        TopOnHelper.intersShow(this@GameActivity, 0, true, topOnCallback)
-                        TopOnHelper.rewardShow(this@GameActivity, 0, true, topOnCallback)
-                    }.start()
+                if (action == ACTION_PRELOAD_ADS) {
+                    TopOnHelper.intersShow(this@GameActivity, 0, true, topOnCallback)
+                    TopOnHelper.rewardShow(this@GameActivity, 0, true, topOnCallback)
                 }
             }
         }
@@ -79,6 +78,8 @@ class GameActivity : BaseActivity(), IWxLogin {
         // TODO: by HY, 2020/7/23 过渡动画
 
 //        startPath("com.atoshi.moduleads.TopOnTestActivity")
+//        startPath("com.atoshi.modulelogin.MainActivityLogin")
+
         startPath("com.atoshi.games.SplashActivity")
     }
 
@@ -88,7 +89,7 @@ class GameActivity : BaseActivity(), IWxLogin {
         mReceiverReload = ReceiverReload().apply {
             registerReceiver(this, IntentFilter().apply {
                 addAction(ACTION_LOAD_URL)
-                addAction(ACTION_LOAD_ADS)
+                addAction(ACTION_PRELOAD_ADS)
             })
         }
         mUpdateReceiver = WxLoginReceiver(this, ACTION_WX_REFRESH).apply {
@@ -137,15 +138,26 @@ class GameActivity : BaseActivity(), IWxLogin {
                 addJavascriptInterface(JsInterface(this@GameActivity, topOnCallback), "AtoshiGame")
             }
             setContentView(mWebView)
+            // TODO: yang 2020/8/20 即使已经pageFinish了，显示出来该页面时还是空白（空白就是finish了，只是游戏加载是另一个过程？）
             loadUrl()
-        }, 1000)
+        }, 500)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            println("GameActivity.onResume: ${ActivityCompat.checkSelfPermission(this, permissions[0])}, ${shouldShowRequestPermissionRationale(permissions[0])}")
-            if (ActivityCompat.checkSelfPermission(this, permissions[0]) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, permissions.toTypedArray(), CODE_PERMISSION_REQUEST)
+        // TODO: yang 2020/8/20 封装延迟操作、倒计时
+        window.decorView.postDelayed({
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        permissions[0]
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    ActivityCompat.requestPermissions(
+                        this,
+                        permissions.toTypedArray(),
+                        CODE_PERMISSION_REQUEST
+                    )
+                }
             }
-        }
+        }, 10000)
     }
 
     // TODO: by HY, 2020/7/24 WebView优化：缓存、预加载...
@@ -206,7 +218,7 @@ class GameActivity : BaseActivity(), IWxLogin {
     }
 
     private fun getUserInfo(wxAccessToken: WxAccessToken) {
-        println("${javaClass.simpleName}.getUserInfo: ${wxAccessToken.access_token}, ${wxAccessToken.openid}, ${wxAccessToken.scope} ")
+        println("GameActivity.getUserInfo: ${wxAccessToken.access_token}, ${wxAccessToken.openid}, ${wxAccessToken.scope} ")
         Api.service.getUserInfo(wxAccessToken.access_token!!, wxAccessToken.openid!!)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

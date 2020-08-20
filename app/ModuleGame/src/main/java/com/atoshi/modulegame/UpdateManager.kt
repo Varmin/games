@@ -31,7 +31,7 @@ class UpdateManager(val context: Context) {
         AlertDialog.Builder(context)
             .setCancelable(false)
             .setMessage("有新的版本可以更新啦~")
-            .setPositiveButton("升级App"){ dialog, which ->
+            .setPositiveButton("升级App"){ _, _ ->
                 var intent = Intent().apply {
                     action = "android.intent.action.VIEW"
                     data = Uri.parse(url)

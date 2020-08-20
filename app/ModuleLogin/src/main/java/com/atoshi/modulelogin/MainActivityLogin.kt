@@ -12,11 +12,10 @@ import com.atoshi.modulebase.wx.ACTION_WX_LOGIN
 import com.atoshi.modulebase.wx.IWxLogin
 import com.atoshi.modulebase.wx.WXUtils
 import com.atoshi.modulebase.wx.WxLoginReceiver
-import com.tencent.mm.opensdk.modelmsg.SendAuth
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.*
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.schedulers.Schedulers.*
 import kotlinx.android.synthetic.main.activity_main_login.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -38,34 +37,24 @@ class MainActivityLogin : BaseActivity(), IWxLogin {
     override fun initView() {
         tvLogin.click {
             loading()
-            runOnUiThread { WXUtils.login() }
+            WXUtils.login()
         }
         tvVersion.text = "v"+getVersionName(this)
     }
 
     override fun onBackPressed() {}
 
-
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(mWxLoginReceiver)
     }
 
-
-
-
-
     // TODO: by HY, 2020/7/16 map操作符优化
-    private fun loginOrRegister(resp: SendAuth.Resp) {
-    }
-
-
-
     override fun getAccessToken(code: String) {
         println("${javaClass.simpleName}.getAccessToken: $code")
         Api.service.getAccessToken(code)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(io())
+            .observeOn(mainThread())
             .subscribe(object : Observer<WxAccessToken> {
                 override fun onSubscribe(d: Disposable?) {
                     loading()
@@ -90,7 +79,6 @@ class MainActivityLogin : BaseActivity(), IWxLogin {
             })
     }
 
-
     // TODO: by HY, 2020/7/23 openId限制太死，还是用token登录，改接口
     private fun wxLogin(wxAccessToken: WxAccessToken) {
         var body = HashMap<String, String>()
@@ -101,8 +89,8 @@ class MainActivityLogin : BaseActivity(), IWxLogin {
             }
 
         Api.service.wxLogin(body)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(io())
+            .observeOn(mainThread())
             .subscribe(object : BaseObserver<UserInfo>() {
                 override fun onSuccess(data: UserInfo) {
                     println("${javaClass.simpleName}.onSuccess: $data ")
@@ -112,9 +100,9 @@ class MainActivityLogin : BaseActivity(), IWxLogin {
                     finish()
                 }
 
-                override fun onError(code: Int, errMsg: String) {
-                    super.onError(code, errMsg)
-                    if(code == 4002){
+                override fun onError(errCode: Int, errMsg: String) {
+                    super.onError(errCode, errMsg)
+                    if(errCode == 4002){
                         getUserInfo(wxAccessToken)
                     }else{
                         loaded()
@@ -123,12 +111,11 @@ class MainActivityLogin : BaseActivity(), IWxLogin {
             })
     }
 
-
     private fun getUserInfo(wxAccessToken: WxAccessToken) {
         println("${javaClass.simpleName}.getUserInfo: ${wxAccessToken.access_token}, ${wxAccessToken.openid}, ${wxAccessToken.scope} ")
         Api.service.getUserInfo(wxAccessToken.access_token!!, wxAccessToken.openid!!)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(io())
+            .observeOn(mainThread())
             .subscribe(object : Observer<WxUserInfo> {
                 override fun onSubscribe(d: Disposable?) {
                     println("${javaClass.simpleName}.onSubscribe: ")
@@ -167,8 +154,8 @@ class MainActivityLogin : BaseActivity(), IWxLogin {
             JSONObject(it as Map<*, *>).toString().toRequestBody("application/json;charset=utf-8".toMediaTypeOrNull())
         }
         Api.service.wxRegister(body)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(io())
+            .observeOn(mainThread())
             .subscribe(object : BaseObserver<UserInfo>() {
                 override fun onSuccess(data: UserInfo) {
                     println("${javaClass.simpleName}.onSuccess: $data ")
@@ -183,7 +170,7 @@ class MainActivityLogin : BaseActivity(), IWxLogin {
                     loaded()
                 }
                 override fun onError(code: Int, errMsg: String) {
-                    super.onError(code, errMsg)
+                    super.onError(errCode = code, errMsg = errMsg)
                     loaded()
                 }
             })

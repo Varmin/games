@@ -56,7 +56,7 @@ object TopOnHelper {
                 }else{
                     val placementId = placementBean!!.splash!![0]
                     var act = container.context as Activity
-                    mSplashAd = ATSplashAd(act, container, placementId, TopOnSplashListener(act, placementId, listenerCallback))
+                    if(!act.isFinishing) mSplashAd = ATSplashAd(act, container, placementId, TopOnSplashListener(act, placementId, listenerCallback))
                 }
             }else{
                 listenerCallback?.error("-1", msg)
@@ -82,7 +82,7 @@ object TopOnHelper {
                         mIntersMap[placementId] = this
                     }
                     if(loading){
-                        if(!atrAd.isAdReady) atrAd.load()
+                        if(!atrAd.isAdReady) atrAd.loading()
                     }else{
                         atrAd.forceShow()
                     }
@@ -98,6 +98,7 @@ object TopOnHelper {
      */
     private val mRewardMap = HashMap<String, TopOnRewardAd>()
     fun rewardShow(act: Activity, index: Int, loading: Boolean, listenerCallback: ListenerCallback?) {
+        println("TopOnHelper.rewardShow: index=$index, loading=$loading")
         getPlacementId { suc, msg ->
             if (suc) {
                 if(placementBean == null || placementBean!!.reward == null || placementBean!!.reward!!.size <= index){
@@ -109,7 +110,7 @@ object TopOnHelper {
                             mRewardMap[placementId] = this
                         }
                     if(loading){
-                        if(!atrAd.isAdReady) atrAd.load()
+                        if(!atrAd.isAdReady) atrAd.loading()
                     }else{
                         atrAd.forceShow()
                     }
@@ -163,8 +164,14 @@ object TopOnHelper {
             setAdListener(mListener)
         }
 
+        fun loading(){
+            mListener.isLoading(true)
+            load()
+        }
+
         fun forceShow(){
             println("TopOnIntersAd.forceShow isAdReady: $isAdReady")
+            mListener.isLoading(false)
             if (isAdReady) {
                 show()
             }else{
@@ -176,6 +183,7 @@ object TopOnHelper {
         }
     }
     class TopOnInterstitialListener(private val placementId: String, private val callback: ListenerCallback?) : ATInterstitialListener {
+        private var mIsLoading: Boolean = false
         private var mForceCallback: (() -> Unit)? = null
         fun forceShow(forceCallback: () -> Unit){
             this.mForceCallback = forceCallback
@@ -191,12 +199,12 @@ object TopOnHelper {
 
         override fun onInterstitialAdShow(p0: ATAdInfo?) {
             println("TopOnInterstitialListener.onInterstitialAdShow: $p0")
-            callback?.success()
+            if(!mIsLoading) callback?.success()
         }
 
         override fun onInterstitialAdLoadFail(p0: AdError?) {
             println("TopOnInterstitialListener.onInterstitialAdLoadFail: ${p0?.printStackTrace()}")
-            callback?.error(placementId, p0?.printStackTrace() ?: "")
+            if(!mIsLoading) callback?.error(placementId, p0?.printStackTrace() ?: "")
         }
 
         override fun onInterstitialAdVideoStart(p0: ATAdInfo?) {
@@ -205,12 +213,12 @@ object TopOnHelper {
 
         override fun onInterstitialAdVideoEnd(p0: ATAdInfo?) {
             println("TopOnInterstitialListener.onInterstitialAdVideoEnd: $p0")
-            callback?.success()
+            if(!mIsLoading) callback?.success()
         }
 
         override fun onInterstitialAdVideoError(p0: AdError?) {
             println("TopOnInterstitialListener.onInterstitialAdVideoError: ${p0?.printStackTrace()}")
-            callback?.error(placementId, p0?.printStackTrace() ?: "")
+            if(!mIsLoading) callback?.error(placementId, p0?.printStackTrace() ?: "")
         }
 
         override fun onInterstitialAdClicked(p0: ATAdInfo?) {
@@ -222,34 +230,52 @@ object TopOnHelper {
             //在此回调中调用load进行广告的加载，方便下一次广告的展示
             mIntersMap[placementId]?.load()
         }
+
+        fun isLoading(isLoading: Boolean) {
+            mIsLoading = isLoading
+        }
     }
 
-    class TopOnRewardAd(act: Activity, val placementId: String, private val callback: ListenerCallback?):ATRewardVideoAd(act, placementId){
+    class TopOnRewardAd(act: Activity, placementId: String, callback: ListenerCallback?):ATRewardVideoAd(act, placementId){
         private val mListener = TopOnRewardListener(placementId, callback)
         init {
             setAdListener(mListener)
         }
 
+        fun loading(){
+            println("TopOnRewardAd.loading")
+            mListener.isLoading(true)
+            load()
+        }
+
         fun forceShow(){
             println("TopOnRewardAd.forceShow isAdReady: $isAdReady")
+            mListener.isLoading(false)
             if (isAdReady) {
-                show()
+                 println("TopOnRewardAd.forceShow-1")
+               show()
+                println("TopOnRewardAd.forceShow-2")
             }else{
                 mListener.forceShow{
+                    println("TopOnRewardAd.forceShow5")
                     show()
+                    println("TopOnRewardAd.forceShow6")
                 }
+                println("TopOnRewardAd.forceShow3")
                 load()
+                println("TopOnRewardAd.forceShow4")
             }
         }
     }
     class TopOnRewardListener(private val placementId: String, private val callback: ListenerCallback?) : ATRewardVideoListener {
+        private var mIsLoading: Boolean = false
         private var mForceCallback: (() -> Unit)? = null
         fun forceShow(forceCallback: () -> Unit){
             this.mForceCallback = forceCallback
         }
         override fun onRewardedVideoAdClosed(p0: ATAdInfo?) {
             println("TopOnRewardListener.onRewardedVideoAdClosed: $p0, $placementId, ${mRewardMap[placementId]}")
-            callback?.success()
+            if(!mIsLoading) callback?.success()
         }
 
         override fun onReward(p0: ATAdInfo?) {
@@ -258,7 +284,7 @@ object TopOnHelper {
 
         override fun onRewardedVideoAdPlayFailed(p0: AdError?, p1: ATAdInfo?) {
             println("TopOnRewardListener.onRewardedVideoAdPlayFailed: ${p0?.printStackTrace()}, $p1")
-            callback?.error(placementId, p0?.printStackTrace() + ", " + p1)
+            if(!mIsLoading) callback?.error(placementId, p0?.printStackTrace() + ", " + p1)
         }
 
         override fun onRewardedVideoAdLoaded() {
@@ -278,7 +304,7 @@ object TopOnHelper {
 
         override fun onRewardedVideoAdFailed(p0: AdError?) {
             println("TopOnRewardListener.onRewardedVideoAdFailed: ${p0?.printStackTrace()}")
-            callback?.error(placementId, p0?.printStackTrace() ?: "")
+            if(!mIsLoading) callback?.error(placementId, p0?.printStackTrace() ?: "")
         }
 
         override fun onRewardedVideoAdPlayEnd(p0: ATAdInfo?) {
@@ -288,6 +314,9 @@ object TopOnHelper {
 
         override fun onRewardedVideoAdPlayClicked(p0: ATAdInfo?) {
             println("TopOnRewardListener.onRewardedVideoAdPlayClicked: $p0")
+        }
+        fun isLoading(isLoading: Boolean) {
+            mIsLoading = isLoading
         }
     }
 

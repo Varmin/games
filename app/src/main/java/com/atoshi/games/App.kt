@@ -1,6 +1,7 @@
 package com.atoshi.games
 
 import android.app.Application
+import android.content.Intent
 import android.os.Build
 import android.webkit.WebView
 import androidx.multidex.MultiDexApplication
@@ -15,30 +16,34 @@ import com.atoshi.modulebase.wx.WXUtils
  * description:
  */
 class App : MultiDexApplication() {
+    var isATsdkInit: Boolean = false
+
+    companion object {
+        lateinit var mInstance: App
+    }
+
     override fun onCreate() {
         super.onCreate()
-
-        init()
+        mInstance = this
+        // TODO: yang 2020/8/20 线程池
         Thread {
             initFromThread()
         }.start()
+        init()
     }
 
     private fun init() {
-
-    }
-
-    private fun initFromThread() {
         SPTool.init(this)
-        WXUtils.registerApp(this)
-
         //Webview多进程兼容（聚合快手时必须添加）
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
             && packageName != Application.getProcessName()
         ) {
             WebView.setDataDirectorySuffix(Application.getProcessName())
         }
+    }
 
+    private fun initFromThread() {
+        WXUtils.registerApp(this)
         if (BuildConfig.DEBUG) ATSDK.setNetworkLogDebug(true)
         ATSDK.init(
             this,
@@ -47,10 +52,14 @@ class App : MultiDexApplication() {
             object : ATSDKInitListener {
                 override fun onSuccess() {
                     println("App.onSuccess")
+                    isATsdkInit = true
+                    sendBroadcast(Intent(ACTION_LOAD_SPLASH))
                 }
 
                 override fun onFail(fail: String?) {
                     println("App.onFail: $fail")
+                    isATsdkInit = true
+                    sendBroadcast(Intent(ACTION_LOAD_SPLASH))
                 }
             })
     }
