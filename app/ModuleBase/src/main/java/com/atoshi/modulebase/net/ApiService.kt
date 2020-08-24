@@ -25,19 +25,7 @@ http://www.bcsvz.com
  * description:
  */
 interface ApiService {
-
-    @GET
-    fun testGet(@Url url: String = "https://wanandroid.com/wxarticle/chapters/json"): Call<String>
-
-    @GET("https://wanandroid.com/wxarticle/{path}/{json}")
-    fun testGet2(
-        @Path("path") chapters: String = "chapters",
-        @Path("json") json: String = "json"
-    ): Observable<BaseResp<List<TestBean>>>
-
-
-
-
+    //--------------------------weixin api--------------------------
     @GET("https://api.weixin.qq.com/sns/oauth2/access_token?grant_type=authorization_code")
     fun getAccessToken(
         @Query("code") respCode: String,
@@ -51,7 +39,6 @@ interface ApiService {
         @Query("appid") appid: String = WXUtils.WX_APP_ID
     ): Observable<WxAccessToken>
 
-
     @GET("https://api.weixin.qq.com/sns/userinfo")
     fun getUserInfo(
         @Query("access_token") accessToken: String,
@@ -59,6 +46,7 @@ interface ApiService {
     ): Observable<WxUserInfo>
 
 
+    //--------------------------game api--------------------------
     @POST("userLogin/wxLogin")
     fun wxLogin(@Body body: RequestBody): Observable<BaseResp<UserInfo>>
     @POST("userLogin/register")

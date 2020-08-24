@@ -13,6 +13,7 @@ import androidx.core.app.ActivityCompat
 import com.atoshi.moduleads.TopOnHelper
 import com.atoshi.modulebase.base.BaseActivity
 import com.atoshi.modulebase.net.Api
+import com.atoshi.modulebase.net.IS_RELEASE
 import com.atoshi.modulebase.net.model.BaseObserver
 import com.atoshi.modulebase.net.model.UserInfo
 import com.atoshi.modulebase.net.model.WxAccessToken
@@ -21,6 +22,8 @@ import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.isExitClickFirst
 import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.wx.*
+import com.atoshi.modulegame.webview.GameWebviewClient
+import com.atoshi.modulegame.webview.JsInterface
 import com.tencent.smtt.sdk.WebView
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observer
@@ -32,9 +35,11 @@ import org.json.JSONObject
 
 const val ACTION_LOAD_URL = "action_load_url"
 const val ACTION_PRELOAD_ADS = "action_preload_ads"
-const val GAME_BASE_URL = "http://game.atoshi.mobi/other/android"
 
 class GameActivity : BaseActivity(), IWxLogin {
+    companion object{
+        var BASE_URL_GAME = if(IS_RELEASE) "http://game.lbtb.org.cn" else "http://game.atoshi.mobi/other/android"
+    }
     init {
         FULL_SCREEN = true
     }
@@ -135,7 +140,11 @@ class GameActivity : BaseActivity(), IWxLogin {
                 )
                 settings.javaScriptEnabled = true
                 webViewClient = GameWebviewClient()
-                addJavascriptInterface(JsInterface(this@GameActivity, topOnCallback), "AtoshiGame")
+                addJavascriptInterface(
+                    JsInterface(
+                        this@GameActivity,
+                        topOnCallback
+                    ), "AtoshiGame")
             }
             setContentView(mWebView)
             // TODO: yang 2020/8/20 即使已经pageFinish了，显示出来该页面时还是空白（空白就是finish了，只是游戏加载是另一个过程？）
@@ -165,7 +174,7 @@ class GameActivity : BaseActivity(), IWxLogin {
         val openId = SPTool.getString(WXUtils.WX_OPEN_ID)
         val token = SPTool.getString(WXUtils.APP_USER_TOKEN)
         val tag = if (reload) "&reload=true" else ""
-        mWebView?.loadUrl("$GAME_BASE_URL?openid=$openId&token=$token$tag")
+        mWebView?.loadUrl("$BASE_URL_GAME?openid=$openId&token=$token$tag")
 //        mWebView?.loadUrl("https://www.baidu.com")
     }
 
@@ -184,6 +193,13 @@ class GameActivity : BaseActivity(), IWxLogin {
     private fun loadUpdate(nickname: String, headimgurl: String) {
         println("GameActivity.loadUpdate：javascript:updateInfo('$nickname', '$headimgurl')")
         mWebView?.loadUrl("javascript:updateInfo('$nickname', '$headimgurl')")
+    }
+
+    /**
+     * 更新token
+     */
+    fun updateToken(token: String){
+        mWebView?.loadUrl("javascript:updateToken('$token')")
     }
 
     // TODO: yang 2020/8/10 整理

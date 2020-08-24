@@ -12,8 +12,9 @@ import java.util.concurrent.TimeUnit
  * created by HYY on 2020/7/13
  * description:
  */
+const val IS_RELEASE = false
 object Api{
-    private const val BASE_URL = "http://47.93.219.181:9599/game/gamebox/"
+    var BASE_URL_API = if(IS_RELEASE) "http://game.lbtb.org.cn/game/gamebox/" else "http://47.93.219.181:9599/game/gamebox/"
     val service: ApiService
     init {
         service = initRetrofit(initOkHttp()).create(ApiService::class.java)
@@ -35,7 +36,7 @@ object Api{
     private fun initRetrofit(okHttpClient: OkHttpClient): Retrofit{
         return Retrofit.Builder().apply {
             client(okHttpClient)
-            baseUrl(BASE_URL)
+            baseUrl(BASE_URL_API)
             addCallAdapterFactory(RxJava3CallAdapterFactory.create())
             addConverterFactory(GsonConverterFactory.create())
         }.build()

@@ -5,14 +5,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.text.TextUtils
+import android.util.Log
 import android.view.KeyEvent
 import com.atoshi.moduleads.TopOnHelper
 import com.atoshi.modulebase.base.BaseActivity
 import com.atoshi.modulebase.utils.SPTool
+import com.atoshi.modulebase.utils.getVersionName
 import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.wx.WXUtils
 import com.atoshi.modulegame.ACTION_PRELOAD_ADS
 import kotlinx.android.synthetic.main.activity_splash.*
+import kotlinx.android.synthetic.main.activity_splash.tvVersion
 
 // TODO: by HY, 2020/7/22 放到base模块
 
@@ -37,6 +40,7 @@ class SplashActivity : BaseActivity() {
     override fun initData() {}
 
     override fun initView() {
+        Log.d(TAG, "initView: ------")
         //上面有可能拿的是sp中的值，这里更新一下
         TopOnHelper.getPlacementIdApi(null)
         //Application中的sdk初始化是在子线程中，此处等初始化完成后再执行
@@ -47,6 +51,8 @@ class SplashActivity : BaseActivity() {
                 registerReceiver(this, IntentFilter(ACTION_LOAD_SPLASH))
             }
         }
+
+        tvVersion.text = "v"+ getVersionName(this)
     }
 
     fun loadSplashAd(){

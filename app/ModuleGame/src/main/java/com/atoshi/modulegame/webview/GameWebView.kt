@@ -1,4 +1,4 @@
-package com.atoshi.modulegame
+package com.atoshi.modulegame.webview
 
 import android.content.Context
 import com.tencent.smtt.sdk.WebView

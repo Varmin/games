@@ -1,9 +1,10 @@
-package com.atoshi.modulegame
+package com.atoshi.modulegame.webview
 
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.widget.Toast
+import com.atoshi.modulegame.GameActivity
 import com.tencent.smtt.sdk.WebView
 import com.tencent.smtt.sdk.WebViewClient
 
@@ -49,7 +50,7 @@ class GameWebviewClient : WebViewClient() {
             copyBackForwardList().run {
                 for (i in (size - 1) downTo 0) {
                     val url = getItemAtIndex(i)?.url
-                    if(url?.startsWith(GAME_BASE_URL) == true) return@run "$url&reload=true"
+                    if(url?.startsWith(GameActivity.BASE_URL_GAME) == true) return@run "$url&reload=true"
                 }
                 return@run null
             }?.run {

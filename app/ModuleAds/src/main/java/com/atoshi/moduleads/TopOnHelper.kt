@@ -321,7 +321,7 @@ object TopOnHelper {
     }
 
 
-    fun getPlacementId(callback: ((suc: Boolean, msg:String) -> Unit)?) {
+    private fun getPlacementId(callback: ((suc: Boolean, msg:String) -> Unit)?) {
         if (SPTool.getString(TOP_ON_AD_IDS).isNullOrEmpty()) {
             getPlacementIdApi(callback)
         }else{
