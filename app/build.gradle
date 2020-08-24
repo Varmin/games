@@ -8,13 +8,18 @@ android {
 
     defaultConfig {
         applicationId "com.atoshi.games"
-        minSdkVersion 16
-        targetSdkVersion 29
-        versionCode 108
-        versionName "1.0.8"
+        minSdkVersion configAndroid.minSdkVersion
+        targetSdkVersion configAndroid.targetSdkVersion
+        versionCode configAndroid.versionCode
+        versionName configAndroid.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+
+        ndk {
+            //慎重修改，容易出兼容性错误，参考：[cpu架构兼容so库问题](https://www.jianshu.com/p/83086940a8dd)
+            abiFilters "armeabi-v7a", "armeabi"
+        }
     }
 
     compileOptions {
@@ -40,6 +45,8 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
+
 }
 
 dependencies {

@@ -235,7 +235,7 @@ class GameActivity : BaseActivity(), IWxLogin {
 
     private fun getUserInfo(wxAccessToken: WxAccessToken) {
         println("GameActivity.getUserInfo: ${wxAccessToken.access_token}, ${wxAccessToken.openid}, ${wxAccessToken.scope} ")
-        Api.service.getUserInfo(wxAccessToken.access_token!!, wxAccessToken.openid!!)
+        Api.service.getUserInfo(wxAccessToken.access_token, wxAccessToken.openid)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : Observer<WxUserInfo> {
@@ -288,8 +288,8 @@ class GameActivity : BaseActivity(), IWxLogin {
                     loadUpdate(info.nickname, info.headimgurl)
                 }
 
-                override fun onError(code: Int, errMsg: String) {
-                    super.onError(code, errMsg)
+                override fun onError(errCode: Int, errMsg: String) {
+                    super.onError(errCode, errMsg)
                     loaded()
                 }
             })

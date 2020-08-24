@@ -64,4 +64,6 @@ dependencies {
     //kapt configDependencies.glide_compiler
 
     api configDependencies.multidex
+
+    api configDependencies.bugly_sdk
 }

@@ -83,7 +83,7 @@ class MainActivityLogin : BaseActivity(), IWxLogin {
     private fun wxLogin(wxAccessToken: WxAccessToken) {
         var body = HashMap<String, String>()
             .apply {
-                put("openId", wxAccessToken.openid!!)
+                put("openId", wxAccessToken.openid)
             }.let {
                 JSONObject(it as Map<*, *>).toString().toRequestBody("application/json;charset=utf-8".toMediaTypeOrNull())
             }
@@ -113,7 +113,7 @@ class MainActivityLogin : BaseActivity(), IWxLogin {
 
     private fun getUserInfo(wxAccessToken: WxAccessToken) {
         println("${javaClass.simpleName}.getUserInfo: ${wxAccessToken.access_token}, ${wxAccessToken.openid}, ${wxAccessToken.scope} ")
-        Api.service.getUserInfo(wxAccessToken.access_token!!, wxAccessToken.openid!!)
+        Api.service.getUserInfo(wxAccessToken.access_token, wxAccessToken.openid)
             .subscribeOn(io())
             .observeOn(mainThread())
             .subscribe(object : Observer<WxUserInfo> {
@@ -169,8 +169,8 @@ class MainActivityLogin : BaseActivity(), IWxLogin {
                     super.onComplete()
                     loaded()
                 }
-                override fun onError(code: Int, errMsg: String) {
-                    super.onError(errCode = code, errMsg = errMsg)
+                override fun onError(errCode: Int, errMsg: String) {
+                    super.onError(errCode = errCode, errMsg = errMsg)
                     loaded()
                 }
             })

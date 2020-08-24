@@ -16,7 +16,7 @@ class WxLoginReceiver(private val login: IWxLogin, private val action: String): 
         intent?.takeIf {
             it.action == action && !it.getStringExtra("code").isNullOrEmpty()
         }?.run {
-            login?.getAccessToken(getStringExtra("code")!!)
+            login.getAccessToken(getStringExtra("code")!!)
         }
     }
 }
