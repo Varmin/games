@@ -65,5 +65,8 @@ dependencies {
 
     api configDependencies.multidex
 
+   /* todo 避免bugly被混淆
+    -dontwarn com.tencent.bugly.**
+    -keep public class com.tencent.bugly.**{*;}*/
     api configDependencies.bugly_sdk
 }

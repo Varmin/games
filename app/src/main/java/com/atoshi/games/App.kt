@@ -1,16 +1,20 @@
 package com.atoshi.games
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
 import android.webkit.WebView
+import androidx.multidex.MultiDex
 import androidx.multidex.MultiDexApplication
 import com.anythink.core.api.ATSDK
 import com.anythink.core.api.ATSDKInitListener
 import com.atoshi.moduleads.TopOnHelper
 import com.atoshi.modulebase.utils.SPTool
+import com.atoshi.modulebase.utils.getVersionName
 import com.atoshi.modulebase.wx.WXUtils
+import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.smtt.sdk.QbSdk
 
 /**
@@ -22,6 +26,16 @@ class App : MultiDexApplication() {
 
     companion object {
         lateinit var mInstance: App
+    }
+
+    /**
+     * todo MultiDex
+     * 如果使用了MultiDex，建议通过Gradle的“multiDexKeepFile”配置等方式把Bugly的类放到主Dex
+     * 另外建议在Application类的"attachBaseContext"方法中主动加载非主dex
+     */
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        MultiDex.install(this)
     }
 
     override fun onCreate() {
@@ -36,6 +50,14 @@ class App : MultiDexApplication() {
 
     private fun init() {
         SPTool.init(this)
+
+        // TODO: yang 2020/8/25 Bugly 捕获异常机制、上报机制、打印上下文信息、一行代码获取app各种信息？
+        var strategy = CrashReport.UserStrategy(this).apply {
+            appVersion = getVersionName(this@App)
+
+        }
+        CrashReport.initCrashReport(this, "f761ad2465", BuildConfig.DEBUG, strategy)
+        CrashReport.setUserId(SPTool.getString(WXUtils.WX_OPEN_ID))
     }
 
     private fun initFromThread() {
