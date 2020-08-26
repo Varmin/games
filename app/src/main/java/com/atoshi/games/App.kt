@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import android.webkit.WebView
 import androidx.multidex.MultiDex
 import androidx.multidex.MultiDexApplication

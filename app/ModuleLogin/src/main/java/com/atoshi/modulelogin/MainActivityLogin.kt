@@ -12,7 +12,6 @@ import com.atoshi.modulebase.wx.ACTION_WX_LOGIN
 import com.atoshi.modulebase.wx.IWxLogin
 import com.atoshi.modulebase.wx.WXUtils
 import com.atoshi.modulebase.wx.WxLoginReceiver
-import com.tencent.bugly.crashreport.CrashReport
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.*
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable

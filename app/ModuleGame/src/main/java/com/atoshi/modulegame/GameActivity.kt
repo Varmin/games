@@ -100,6 +100,10 @@ class GameActivity : BaseActivity(), IWxLogin {
         mUpdateReceiver = WxLoginReceiver(this, ACTION_WX_REFRESH).apply {
             registerReceiver(this, IntentFilter(ACTION_WX_LOGIN))
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
         UpdateManager(this).checkVersion()
     }
 
@@ -140,11 +144,7 @@ class GameActivity : BaseActivity(), IWxLogin {
                 )
                 settings.javaScriptEnabled = true
                 webViewClient = GameWebviewClient()
-                addJavascriptInterface(
-                    JsInterface(
-                        this@GameActivity,
-                        topOnCallback
-                    ), "AtoshiGame")
+                addJavascriptInterface(JsInterface(this@GameActivity, topOnCallback), "AtoshiGame")
             }
             setContentView(mWebView)
             // TODO: yang 2020/8/20 即使已经pageFinish了，显示出来该页面时还是空白（空白就是finish了，只是游戏加载是另一个过程？）

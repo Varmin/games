@@ -10,6 +10,7 @@ import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.wx.IWxLogin
 import com.atoshi.modulebase.wx.WXUtils
 import com.atoshi.modulegame.GameActivity
+import com.atoshi.modulegame.UpdateManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -62,7 +63,6 @@ class JsInterface(private val act: GameActivity, private val callback: TopOnHelp
     fun updateToken(){
         useLogin()
     }
-
     private fun useLogin() {
         val openId = SPTool.getString(WXUtils.WX_OPEN_ID)
         var body = HashMap<String, String>()
@@ -88,5 +88,13 @@ class JsInterface(private val act: GameActivity, private val callback: TopOnHelp
                     act.toast(errMsg)
                 }
             })
+    }
+
+    @JavascriptInterface
+    fun getVersionCode():String = getVersionCode()
+
+    @JavascriptInterface
+    fun checkUpgradeApp(){
+        UpdateManager(act).checkVersion()
     }
 }

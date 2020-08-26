@@ -20,6 +20,9 @@ android {
             //慎重修改，容易出兼容性错误，参考：[cpu架构兼容so库问题](https://www.jianshu.com/p/83086940a8dd)
             abiFilters "armeabi-v7a", "armeabi"
         }
+
+        //buildConfigField ("boolean", "IS_DEBUG", ${IS_DEBUG})
+        //buildConfigField "boolean", "IS_DEBUG", IS_DEBUG
     }
 
     compileOptions {
@@ -45,9 +48,30 @@ android {
             signingConfig signingConfigs.release
         }
     }
-
-
 }
+
+/**
+ Direct local .aar file dependencies are not supported when building an AAR.
+ The resulting AAR would be broken because the classes and Android resources
+ from any local .aar file dependencies would not be packaged in the resulting AAR.
+
+ Previous versions of the Android Gradle Plugin produce broken AARs in this case too (despite not throwing this error).
+ The following direct local .aar file dependencies of the :app:ModuleAds project caused this error:
+ D:\workspace\Atoshi\games\app\ModuleAds\top_libs\android-gif-drawable-1.2.15.aar,
+ D:\workspace\Atoshi\games\app\ModuleAds\top_libs\anythink_banner.aar,
+ D:\workspace\Atoshi\games\app\ModuleAds\top_libs\anythink_china_core.aar,
+ D:\workspace\Atoshi\games\app\ModuleAds\top_libs\anythink_core.aar,
+ D:\workspace\Atoshi\games\app\ModuleAds\top_libs\anythink_headbidding.aar,
+ D:\workspace\Atoshi\games\app\ModuleAds\top_libs\anythink_interstitial.aar,
+ D:\workspace\Atoshi\games\app\ModuleAds\top_libs\anythink_native.aar,
+ D:\workspace\Atoshi\games\app\ModuleAds\top_libs\anythink_network_gdt.aar,
+ D:\workspace\Atoshi\games\app\ModuleAds\top_libs\anythink_network_pangle_china.aar,
+ D:\workspace\Atoshi\games\app\ModuleAds\top_libs\anythink_rewardvideo.aar,
+ D:\workspace\Atoshi\games\app\ModuleAds\top_libs\anythink_splash.aar,
+ D:\workspace\Atoshi\games\app\ModuleAds\top_libs\GDTSDK.tbsNormal.4.211.1081.aar,
+ D:\workspace\Atoshi\games\app\ModuleAds\top_libs\open_ad_sdk_3.1.0.0.aar,
+ D:\workspace\Atoshi\games\app\ModuleAds\top_libs\tramini_sdk.aar
+ */
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])

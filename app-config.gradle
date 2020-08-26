@@ -1,8 +1,10 @@
 ext{
+
+    IS_DEBUG = false
+
     IS_APPLICATION = false
 
     configAndroid = [
-            is_release: false,
             versionCode : 109,
             versionName : "1.0.9",
             minSdkVersion    : 16,
