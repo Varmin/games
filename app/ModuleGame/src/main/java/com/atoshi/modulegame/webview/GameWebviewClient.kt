@@ -3,10 +3,10 @@ package com.atoshi.modulegame.webview
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Toast
 import com.atoshi.modulegame.GameActivity
-import com.tencent.smtt.sdk.WebView
-import com.tencent.smtt.sdk.WebViewClient
 
 /**
  * todo token验证？

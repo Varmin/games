@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.view.KeyEvent
 import android.view.ViewGroup
+import android.webkit.WebView
 import androidx.core.app.ActivityCompat
 import com.atoshi.moduleads.TopOnHelper
 import com.atoshi.modulebase.base.BaseActivity
@@ -24,7 +25,6 @@ import com.atoshi.modulebase.utils.startPath
 import com.atoshi.modulebase.wx.*
 import com.atoshi.modulegame.webview.GameWebviewClient
 import com.atoshi.modulegame.webview.JsInterface
-import com.tencent.smtt.sdk.WebView
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable

@@ -14,7 +14,6 @@ import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.getVersionName
 import com.atoshi.modulebase.wx.WXUtils
 import com.tencent.bugly.crashreport.CrashReport
-import com.tencent.smtt.sdk.QbSdk
 
 /**
  * created by HYY on 2020/7/9
@@ -68,12 +67,12 @@ class App : MultiDexApplication() {
             && packageName != Application.getProcessName()) {
             WebView.setDataDirectorySuffix(Application.getProcessName())
         }
-        QbSdk.initX5Environment(this, object : QbSdk.PreInitCallback{
+        /*QbSdk.initX5Environment(this, object : QbSdk.PreInitCallback{
             override fun onCoreInitFinished() {}
             override fun onViewInitFinished(p0: Boolean) {
                 println("App.onViewInitFinished: $p0")
             }
-        })
+        })*/
 
         //TopOn
         if (BuildConfig.DEBUG) ATSDK.setNetworkLogDebug(true)

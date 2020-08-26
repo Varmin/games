@@ -90,8 +90,11 @@ class JsInterface(private val act: GameActivity, private val callback: TopOnHelp
             })
     }
 
-    @JavascriptInterface
-    fun getVersionCode():String = getVersionCode()
+    @JavascriptInterface//109
+    fun getVersionCode():Int = com.atoshi.modulebase.utils.getVersionCode(act)
+
+    @JavascriptInterface//1.0.9
+    fun getVersionName():String = com.atoshi.modulebase.utils.getVersionName(act)
 
     @JavascriptInterface
     fun checkUpgradeApp(){

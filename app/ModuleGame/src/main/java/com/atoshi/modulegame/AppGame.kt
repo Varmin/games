@@ -1,7 +1,6 @@
 package com.atoshi.modulegame
 
 import android.app.Application
-import com.tencent.smtt.sdk.QbSdk
 
 /**
  * created by HYY on 2020/7/3
@@ -10,10 +9,9 @@ import com.tencent.smtt.sdk.QbSdk
 class AppGame: Application() {
     private val TAG = "GameApp"
     override fun onCreate() {
-
         super.onCreate()
         Thread(Runnable {
-            QbSdk.initX5Environment(this, object : QbSdk.PreInitCallback{
+            /*QbSdk.initX5Environment(this, object : QbSdk.PreInitCallback{
                 override fun onCoreInitFinished() {
                     println("$TAG.onCoreInitFinished: ")
                 }
@@ -22,7 +20,7 @@ class AppGame: Application() {
                     println("$TAG.onViewInitFinished: $p0")
                 }
 
-            })
+            })*/
         }).start()
     }
 }

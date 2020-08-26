@@ -45,10 +45,6 @@ dependencies {
     //微信开放平台
     api configDependencies.tencent_wx_dev
 
-    /*
-    与广点通SDK类冲突
-    api configDependencies.tencent_tbs*/
-
     //retrofit、rxjava
     api configDependencies.retrofit
     api configDependencies.retrofit_adapter
