@@ -158,7 +158,7 @@ object TopOnHelper {
         }
     }
 
-    class TopOnIntersAd(act: Activity, val placementId: String, private val callback: ListenerCallback?): ATInterstitial(act, placementId){
+    class TopOnIntersAd(val act: Activity, val placementId: String, private val callback: ListenerCallback?): ATInterstitial(act, placementId){
         private val mListener = TopOnInterstitialListener(placementId, callback)
         init {
             setAdListener(mListener)
@@ -166,19 +166,19 @@ object TopOnHelper {
 
         fun loading(){
             mListener.isLoading(true)
-            load()
+            if(act != null && !act.isFinishing) load()
         }
 
         fun forceShow(){
             println("TopOnIntersAd.forceShow isAdReady: $isAdReady")
             mListener.isLoading(false)
             if (isAdReady) {
-                show()
+                if(act != null && !act.isFinishing) show()
             }else{
                 mListener.forceShow{
-                    show()
+                    if(act != null && !act.isFinishing) show()
                 }
-                load()
+                if(act != null && !act.isFinishing) load()
             }
         }
     }
@@ -236,7 +236,7 @@ object TopOnHelper {
         }
     }
 
-    class TopOnRewardAd(act: Activity, placementId: String, callback: ListenerCallback?):ATRewardVideoAd(act, placementId){
+    class TopOnRewardAd(val act: Activity, placementId: String, callback: ListenerCallback?):ATRewardVideoAd(act, placementId){
         private val mListener = TopOnRewardListener(placementId, callback)
         init {
             setAdListener(mListener)
@@ -245,7 +245,7 @@ object TopOnHelper {
         fun loading(){
             println("TopOnRewardAd.loading")
             mListener.isLoading(true)
-            load()
+            if(act != null && !act.isFinishing) load()
         }
 
         fun forceShow(){
@@ -253,16 +253,16 @@ object TopOnHelper {
             mListener.isLoading(false)
             if (isAdReady) {
                  println("TopOnRewardAd.forceShow-1")
-               show()
+                if(act != null && !act.isFinishing) show()
                 println("TopOnRewardAd.forceShow-2")
             }else{
                 mListener.forceShow{
                     println("TopOnRewardAd.forceShow5")
-                    show()
+                    if(act != null && !act.isFinishing) show()
                     println("TopOnRewardAd.forceShow6")
                 }
                 println("TopOnRewardAd.forceShow3")
-                load()
+                if(act != null && !act.isFinishing) load()
                 println("TopOnRewardAd.forceShow4")
             }
         }
