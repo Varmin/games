@@ -243,7 +243,6 @@ object TopOnHelper {
         }
 
         fun loading(){
-            println("TopOnRewardAd.loading")
             mListener.isLoading(true)
             if(act != null && !act.isFinishing) load()
         }
@@ -252,18 +251,12 @@ object TopOnHelper {
             println("TopOnRewardAd.forceShow isAdReady: $isAdReady")
             mListener.isLoading(false)
             if (isAdReady) {
-                 println("TopOnRewardAd.forceShow-1")
                 if(act != null && !act.isFinishing) show()
-                println("TopOnRewardAd.forceShow-2")
             }else{
                 mListener.forceShow{
-                    println("TopOnRewardAd.forceShow5")
                     if(act != null && !act.isFinishing) show()
-                    println("TopOnRewardAd.forceShow6")
                 }
-                println("TopOnRewardAd.forceShow3")
                 if(act != null && !act.isFinishing) load()
-                println("TopOnRewardAd.forceShow4")
             }
         }
     }

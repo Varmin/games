@@ -174,8 +174,8 @@ class GameActivity : BaseActivity(), IWxLogin {
         val openId = SPTool.getString(WXUtils.WX_OPEN_ID)
         val token = SPTool.getString(WXUtils.APP_USER_TOKEN)
         val tag = if (reload) "&reload=true" else ""
-        mWebView?.loadUrl("$BASE_URL_GAME?openid=$openId&token=$token$tag")
-//        mWebView?.loadUrl("https://www.baidu.com")
+//        mWebView?.loadUrl("$BASE_URL_GAME?openid=$openId&token=$token$tag")
+        mWebView?.loadUrl("https://www.baidu.com")
     }
 
     private fun adsShowSuccess() {

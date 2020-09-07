@@ -16,10 +16,10 @@
             android:name=".SplashActivity"
             android:screenOrientation="portrait" />
         <activity android:name="com.atoshi.modulegame.GameActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
