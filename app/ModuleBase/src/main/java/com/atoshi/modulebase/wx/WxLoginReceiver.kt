@@ -11,7 +11,7 @@ import android.content.Intent
  */
 const val ACTION_WX_LOGIN = "action_wx_login"
 const val ACTION_WX_REFRESH = "action_wx_refresh"
-class WxLoginReceiver(private val login: IWxLogin, private val action: String): BroadcastReceiver() {
+class WxLoginReceiver(private val login: IWxApi, private val action: String): BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         intent?.takeIf {
             it.action == action && !it.getStringExtra("code").isNullOrEmpty()

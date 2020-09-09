@@ -6,22 +6,20 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.view.KeyEvent
 import android.view.ViewGroup
 import android.webkit.WebView
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.atoshi.moduleads.TopOnHelper
 import com.atoshi.modulebase.base.BaseActivity
 import com.atoshi.modulebase.net.Api
 import com.atoshi.modulebase.net.IS_RELEASE
-import com.atoshi.modulebase.net.model.BaseObserver
-import com.atoshi.modulebase.net.model.UserInfo
-import com.atoshi.modulebase.net.model.WxAccessToken
-import com.atoshi.modulebase.net.model.WxUserInfo
-import com.atoshi.modulebase.utils.SPTool
-import com.atoshi.modulebase.utils.isExitClickFirst
-import com.atoshi.modulebase.utils.startPath
+import com.atoshi.modulebase.net.model.*
+import com.atoshi.modulebase.utils.*
 import com.atoshi.modulebase.wx.*
 import com.atoshi.modulegame.webview.GameWebviewClient
 import com.atoshi.modulegame.webview.JsInterface
@@ -36,7 +34,7 @@ import org.json.JSONObject
 const val ACTION_LOAD_URL = "action_load_url"
 const val ACTION_PRELOAD_ADS = "action_preload_ads"
 
-class GameActivity : BaseActivity(), IWxLogin {
+class GameActivity : BaseActivity(), IWxApi, IApiForGame {
     companion object{
         var BASE_URL_GAME = if(IS_RELEASE) "http://game.lbtb.org.cn" else "http://game.atoshi.mobi/other/android"
     }
@@ -81,10 +79,6 @@ class GameActivity : BaseActivity(), IWxLogin {
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         // TODO: by HY, 2020/7/23 过渡动画
-
-//        startPath("com.atoshi.moduleads.TopOnTestActivity")
-//        startPath("com.atoshi.modulelogin.MainActivityLogin")
-
         startPath("com.atoshi.games.SplashActivity")
     }
 
@@ -174,8 +168,8 @@ class GameActivity : BaseActivity(), IWxLogin {
         val openId = SPTool.getString(WXUtils.WX_OPEN_ID)
         val token = SPTool.getString(WXUtils.APP_USER_TOKEN)
         val tag = if (reload) "&reload=true" else ""
-//        mWebView?.loadUrl("$BASE_URL_GAME?openid=$openId&token=$token$tag")
-        mWebView?.loadUrl("https://www.baidu.com")
+        mWebView?.loadUrl("$BASE_URL_GAME?openid=$openId&token=$token$tag")
+//        mWebView?.loadUrl("https://www.baidu.com")
     }
 
     private fun adsShowSuccess() {
@@ -293,6 +287,63 @@ class GameActivity : BaseActivity(), IWxLogin {
                     loaded()
                 }
             })
+    }
+
+    override fun shareConfig() {
+        Api.service.shareConfig(SPTool.getString(WXUtils.APP_USER_TOKEN))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object :BaseObserver<ShareConfig>(){
+                override fun onSubscribe(d: Disposable?) {
+                    super.onSubscribe(d)
+                    loading()
+                }
+                override fun onSuccess(data: ShareConfig) {
+                    share(data)
+                }
+
+                override fun onError(errCode: Int, errMsg: String) {
+                    super.onError(errCode, errMsg)
+                    loaded()
+                }
+            })
+    }
+
+    private fun share(shareConfig: ShareConfig){
+        if(shareConfig.shareList.isNotEmpty()){
+            shareConfig.shareList[0].run {
+                PosterHelper.getInstance()
+                    .setBgUrl(bgUrl)
+                    .setAvatarUrl(shareConfig.avatar)
+                    .setCodeUrl(qrCodeUrl)
+                    .setCodeStr("我的邀请码：${shareConfig.inviteCode}")
+                    .setIntroStr("我是${shareConfig.nickName}\n${description}")
+                    .getPosterBitmap(object :PosterHelper.Callback{
+                        override fun success(bitmap: Bitmap) {
+                            loaded()
+                            showPosterDialog(bitmap)
+                        }
+                        override fun failed(errMsg: String) {
+                            loaded()
+                            Toast.makeText(this@GameActivity, errMsg, Toast.LENGTH_SHORT).show()
+                        }
+                    })
+            }
+        }
+    }
+
+    private fun showPosterDialog(bitmap: Bitmap) {
+        PosterDialog.getInstance(this@GameActivity)
+            .setPosterBitmap(bitmap)
+            .setShareClickListener(object : PosterDialog.ShareClickListener{
+                override fun shareFriends() {
+                    WXUtils.share(bitmap, true)
+                }
+                override fun shareFriendsCircle() {
+                    WXUtils.share(bitmap, false)
+                }
+            })
+            .init().show()
     }
 }
 

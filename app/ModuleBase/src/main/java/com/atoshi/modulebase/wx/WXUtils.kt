@@ -1,10 +1,17 @@
 package com.atoshi.modulebase.wx
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.widget.Toast
+import com.atoshi.modulebase.utils.SPTool
 import com.tencent.mm.opensdk.modelmsg.SendAuth
+import com.tencent.mm.opensdk.modelmsg.SendMessageToWX
+import com.tencent.mm.opensdk.modelmsg.WXImageObject
+import com.tencent.mm.opensdk.modelmsg.WXMediaMessage
 import com.tencent.mm.opensdk.openapi.IWXAPI
 import com.tencent.mm.opensdk.openapi.WXAPIFactory
+import java.io.ByteArrayOutputStream
+
 
 /**
  * created by HYY on 2020/7/9
@@ -51,5 +58,38 @@ object WXUtils {
     }
 
     fun getWXApi(): IWXAPI = mWxApi
+
+    fun share(bmp: Bitmap, isFriend: Boolean){
+        if (mWxApi.isWXAppInstalled) {
+            //初始化 WXImageObject 和 WXMediaMessage 对象
+            val msg = WXMediaMessage().apply {
+                mediaObject =  WXImageObject(bmp)
+                //设置缩略图
+                val thumbBmp = Bitmap.createScaledBitmap(bmp, 100, 200, true)
+                bmp.recycle()
+                thumbData = bitmap2Bytes(thumbBmp)
+            }
+
+            //构造一个Req
+            val req = SendMessageToWX.Req().apply {
+                transaction = "img" + System.currentTimeMillis()
+                message = msg
+                scene = if(isFriend) SendMessageToWX.Req.WXSceneSession else SendMessageToWX.Req.WXSceneTimeline
+                userOpenId = SPTool.getString(WXUtils.WX_OPEN_ID)
+            }
+            mWxApi.sendReq(req)
+        } else {
+            Toast.makeText(mContext, "您还未安装微信客户端！", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun bitmap2Bytes(bitmap: Bitmap): ByteArray {
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos)
+        bitmap.recycle()
+        println("WXUtils.bitmap2Bytes: ${baos.size() / (1024)}")
+        return baos.toByteArray()
+    }
+
 }
 

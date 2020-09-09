@@ -3,8 +3,8 @@ package com.atoshi.modulebase.wx
 /**
  * author：yang
  * created on：2020/8/10 14:24
- * description:
+ * description: 调用api接口
  */
-interface IWxLogin {
+interface IWxApi {
     fun getAccessToken(code: String)
 }

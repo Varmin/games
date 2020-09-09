@@ -7,9 +7,10 @@ import com.atoshi.modulebase.net.model.BaseObserver
 import com.atoshi.modulebase.net.model.UserInfo
 import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.startPath
-import com.atoshi.modulebase.wx.IWxLogin
+import com.atoshi.modulebase.wx.IWxApi
 import com.atoshi.modulebase.wx.WXUtils
 import com.atoshi.modulegame.GameActivity
+import com.atoshi.modulegame.IApiForGame
 import com.atoshi.modulegame.UpdateManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -49,12 +50,11 @@ class JsInterface(private val act: GameActivity, private val callback: TopOnHelp
 
     @JavascriptInterface
     fun updateUserInfo(){
-        SPTool.getString(WXUtils.WX_REFRESH_ACCESS_TOKEN).takeIf {
-            println("JsInterface.updateUserInfo: $it")
-            !it.isNullOrEmpty()
-        }?.run {
-            act.runOnUiThread {
-                (act as? IWxLogin)?.getAccessToken(this)
+        SPTool.getString(WXUtils.WX_REFRESH_ACCESS_TOKEN).run {
+            if (isNullOrEmpty()) {
+                signOut()
+            }else{
+                act.runOnUiThread { (act as? IWxApi)?.getAccessToken(this) }
             }
         }
     }
@@ -98,4 +98,9 @@ class JsInterface(private val act: GameActivity, private val callback: TopOnHelp
 
     @JavascriptInterface
     fun checkUpgradeApp() = UpdateManager(act).checkVersion()
+
+    @JavascriptInterface
+    fun shareConfig(){
+        act.runOnUiThread { if(!act.isFinishing) (act as IApiForGame).shareConfig() }
+    }
 }

@@ -57,4 +57,7 @@ interface ApiService {
     fun checkVersion():Observable<BaseResp<VersionInfo>>
     @POST("userLogin/update")
     fun update(@Header("token") token:String, @Body body: RequestBody): Observable<BaseResp<UserInfo>>
+
+    @GET("info/shareConfig")
+    fun shareConfig(@Header("token") token:String): Observable<BaseResp<ShareConfig>>
 }

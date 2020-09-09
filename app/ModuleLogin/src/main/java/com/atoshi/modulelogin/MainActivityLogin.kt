@@ -9,7 +9,7 @@ import com.atoshi.modulebase.net.model.*
 import com.atoshi.modulebase.utils.SPTool
 import com.atoshi.modulebase.utils.getVersionName
 import com.atoshi.modulebase.wx.ACTION_WX_LOGIN
-import com.atoshi.modulebase.wx.IWxLogin
+import com.atoshi.modulebase.wx.IWxApi
 import com.atoshi.modulebase.wx.WXUtils
 import com.atoshi.modulebase.wx.WxLoginReceiver
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.*
@@ -22,7 +22,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
 
-class MainActivityLogin : BaseActivity(), IWxLogin {
+class MainActivityLogin : BaseActivity(), IWxApi {
     private lateinit var mWxLoginReceiver: WxLoginReceiver
     init {
         FULL_SCREEN = true

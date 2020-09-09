@@ -21,7 +21,7 @@ object Api{
     }
 
     private fun initOkHttp():OkHttpClient{
-        var httpClient = OkHttpClient.Builder().apply {
+        val httpClient = OkHttpClient.Builder().apply {
             connectTimeout(60, TimeUnit.SECONDS)
             writeTimeout(60, TimeUnit.SECONDS)
             readTimeout(60, TimeUnit.SECONDS)
