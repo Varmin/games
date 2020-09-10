@@ -21,8 +21,7 @@ android {
             abiFilters "armeabi-v7a", "armeabi"
         }
 
-        //buildConfigField ("boolean", "IS_DEBUG", ${IS_DEBUG})
-        //buildConfigField "boolean", "IS_DEBUG", IS_DEBUG
+        buildConfigField ("boolean", "IS_DEBUG", "${IS_DEBUG}")
     }
 
     compileOptions {

@@ -1,5 +1,6 @@
 package com.atoshi.modulebase.net
 
+import com.atoshi.modulebase.BuildConfig
 import me.jessyan.retrofiturlmanager.RetrofitUrlManager
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -12,9 +13,9 @@ import java.util.concurrent.TimeUnit
  * created by HYY on 2020/7/13
  * description:
  */
-const val IS_RELEASE = true
 object Api{
-    var BASE_URL_API = if(IS_RELEASE) "http://game.lbtb.org.cn/game/gamebox/" else "http://47.93.219.181:9599/game/gamebox/"
+    var BASE_URL_API = if(BuildConfig.IS_DEBUG) "http://game.lbtb.org.cn/game/gamebox/" else "http://47.93.219.181:9599/game/gamebox/"
+
     val service: ApiService
     init {
         service = initRetrofit(initOkHttp()).create(ApiService::class.java)

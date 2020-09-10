@@ -66,26 +66,20 @@ public class PosterHelper {
             Bitmap QRCBitmap = getBitmap(mCodeUrl);
             long drawStart = SystemClock.currentThreadTimeMillis();
             Bitmap newBitmap = drawBitmap(bgBitmap, headerBitmap, QRCBitmap, mCodeStr, mIntroStr);
-            System.out.println("PosterActivity.onCreate， drawTims = "+ (SystemClock.currentThreadTimeMillis() - drawStart));
+            System.out.println("PosterHelper.onCreate， drawTims = "+ (SystemClock.currentThreadTimeMillis() - drawStart));
             new Handler(Looper.getMainLooper()).post(()->{
-                if (newBitmap != null) {
-                    mCallback.success(newBitmap);
-                }else {
-                    mCallback.failed("获取海报图片失败");
-                }
+                mCallback.success(newBitmap);
             });
         }).start();
     }
 
     private Bitmap drawBitmap(Bitmap backgroundBitmap, Bitmap headerBitmap, Bitmap qrcBitmap, String codeStr, String introStr) {
-        if (backgroundBitmap == null || headerBitmap == null || qrcBitmap == null ) {
-            return null;
-        }
+        // TODO: yang 2020/9/9 null
         Bitmap bgBitmap = backgroundBitmap.copy(backgroundBitmap.getConfig(), true);
         Canvas canvas = new Canvas(bgBitmap);
         int width = canvas.getWidth();
         int height = canvas.getHeight();
-        System.out.println("PosterActivity.drawBitmap: wh: "+width+", "+height);
+        System.out.println("PosterHelper.drawBitmap: wh: "+width+", "+height);
 
         Paint paint = new Paint();
         paint.setFlags(Paint.ANTI_ALIAS_FLAG);
@@ -96,11 +90,12 @@ public class PosterHelper {
         canvas.drawRoundRect(bgBotRect, width*0.03f, width*0.03f, paint);
         //我的邀请码
         Rect codeRect = new Rect();
-        paint.setColor(Color.GREEN);
-        paint.setTextSize(width*0.04f);
+        paint.setColor(0xFF29b833);
+        paint.setTextSize(width*0.055f);
+        paint.setFakeBoldText(true);
         paint.getTextBounds(codeStr, 0, codeStr.length(), codeRect);
         System.out.println("PosterHelper.drawBitmap: code = "+codeRect);
-        canvas.drawText(codeStr, bgBotRect.left*2, bgBotRect.top + bgBotRect.left*2 + Math.abs(codeRect.top), paint);
+        canvas.drawText(codeStr, bgBotRect.left*2, bgBotRect.top + bgBotRect.left*3/2 + Math.abs(codeRect.top), paint);
         //头像
         RectF disHeaderRectF = new RectF();
         disHeaderRectF.left = bgBotRect.left*2;
@@ -119,6 +114,10 @@ public class PosterHelper {
         float introSize = width * 0.037f;
         String[] intros = introStr.split("\n");
 
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(introSize);
+        paint.setFakeBoldText(false);
+
         String intro1 = intros[0];
         Rect intro1Rect = new Rect();
         paint.getTextBounds(intro1, 0, intro1.length(), intro1Rect);
@@ -126,8 +125,6 @@ public class PosterHelper {
         intro1Rect.right = (int) (disCodeRectF.left - bgBotRect.left);
         intro1Rect.top = (int) (disHeaderRectF.top - bgBotRect.left/3);
         intro1Rect.bottom = (int) (disHeaderRectF.top + introSize);
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(introSize);
         canvas.drawText(intros[0], intro1Rect.left, intro1Rect.top + (intro1Rect.bottom - intro1Rect.top), paint);
 
         //介绍
@@ -149,12 +146,12 @@ public class PosterHelper {
         if(!backgroundBitmap.isRecycled()) backgroundBitmap.recycle();
         if(!headerBitmap.isRecycled()) headerBitmap.recycle();
         if(!qrcBitmap.isRecycled()) qrcBitmap.recycle();
-        System.out.println("PosterActivity.drawBitmap: isRecycled="+bgBitmap.isRecycled());
+        System.out.println("PosterHelper.drawBitmap: isRecycled="+bgBitmap.isRecycled());
         return bgBitmap;
     }
 
     private Bitmap getBitmap(String imgUrl){
-        System.out.println("PosterActivity.getBitmap: start...");
+        System.out.println("PosterHelper.getBitmap: start...");
         long startTime = SystemClock.currentThreadTimeMillis();
         InputStream inputStream = null;
         ByteArrayOutputStream outputStream = null;
@@ -174,21 +171,20 @@ public class PosterHelper {
                     outputStream.write(buffer, 0, len);
                 }
                 byte[] bytes = outputStream.toByteArray();
-                //Bitmap retBitmap = RxImageTool.getBitmap(bytes, 0, 500, 1000);
                 Bitmap retBitmap = sampleBitmap(bytes);
                 long endTime = SystemClock.currentThreadTimeMillis();
-                System.out.println("PosterActivity.getBitmap：times："+ (endTime - startTime));
+                System.out.println("PosterHelper.getBitmap：times："+ (endTime - startTime));
                 return retBitmap;
             }else {
-                System.out.println("PosterActivity.getBitmap, 获取图片失败："+httpURLConnection.getResponseCode());
-                error("获取图片失败："+httpURLConnection.getResponseCode());
+                System.out.println("PosterHelper.getBitmap, 获取图片失败："+httpURLConnection.getResponseCode());
+                mCallback.failed("获取图片失败："+httpURLConnection.getResponseCode());
             }
         }catch (Exception e){
             e.printStackTrace();
-            System.out.println("PosterActivity.getBitmap: e="+e.toString());
-            error(e.toString());
+            System.out.println("PosterHelper.getBitmap: e="+e.toString());
+            mCallback.failed(e.toString());
         }finally {
-            System.out.println("PosterActivity.getBitmap: finally");
+            System.out.println("PosterHelper.getBitmap: finally");
             try {
                 inputStream.close();
             }catch (Exception e){ e.printStackTrace();}
@@ -207,15 +203,10 @@ public class PosterHelper {
         int sampleSize = Math.max(1, Math.max(options.outWidth/500, options.outHeight/1000));
         options.inJustDecodeBounds = false;
         options.inSampleSize = sampleSize;
-        System.out.println("PosterActivity.sampleBitmap: sampleSize = "+sampleSize);
+        System.out.println("PosterHelper.sampleBitmap: sampleSize = "+sampleSize);
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
     }
 
-    private void error(String error){
-        new Handler(Looper.getMainLooper()).post(()->{
-            mCallback.failed(error);
-        });
-    }
     public interface Callback{
         void success(Bitmap bitmap);
         void failed(String errMsg);

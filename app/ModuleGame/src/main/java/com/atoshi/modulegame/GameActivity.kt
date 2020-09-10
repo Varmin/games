@@ -17,7 +17,6 @@ import androidx.core.app.ActivityCompat
 import com.atoshi.moduleads.TopOnHelper
 import com.atoshi.modulebase.base.BaseActivity
 import com.atoshi.modulebase.net.Api
-import com.atoshi.modulebase.net.IS_RELEASE
 import com.atoshi.modulebase.net.model.*
 import com.atoshi.modulebase.utils.*
 import com.atoshi.modulebase.wx.*
@@ -36,7 +35,7 @@ const val ACTION_PRELOAD_ADS = "action_preload_ads"
 
 class GameActivity : BaseActivity(), IWxApi, IApiForGame {
     companion object{
-        var BASE_URL_GAME = if(IS_RELEASE) "http://game.lbtb.org.cn" else "http://game.atoshi.mobi/other/android"
+        var BASE_URL_GAME = if(BuildConfig.IS_DEBUG) "http://game.lbtb.org.cn" else "http://game.atoshi.mobi/other/android"
     }
     init {
         FULL_SCREEN = true

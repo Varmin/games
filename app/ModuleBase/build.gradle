@@ -17,6 +17,8 @@ android {
         consumerProguardFiles "consumer-rules.pro"
 
         multiDexEnabled true
+
+        buildConfigField ("boolean", "IS_DEBUG", "${IS_DEBUG}")
     }
 
     buildTypes {
@@ -30,6 +32,8 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+
 }
 
 dependencies {
