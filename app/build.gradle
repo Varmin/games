@@ -18,7 +18,7 @@ android {
 
         ndk {
             //慎重修改，容易出兼容性错误，参考：[cpu架构兼容so库问题](https://www.jianshu.com/p/83086940a8dd)
-            abiFilters "armeabi-v7a", "armeabi"
+            abiFilters "armeabi-v7a", "armeabi"//, "x86"
         }
 
         buildConfigField ("boolean", "IS_DEBUG", "${IS_DEBUG}")

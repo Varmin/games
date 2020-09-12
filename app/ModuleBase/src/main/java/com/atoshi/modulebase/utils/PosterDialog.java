@@ -1,5 +1,6 @@
 package com.atoshi.modulebase.utils;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -67,5 +68,15 @@ public class PosterDialog extends Dialog {
 
         contentView.findViewById(R.id.iv_dismiss).setOnClickListener(v -> dismiss());
         return this;
+    }
+
+    @Override
+    public void show() {
+        Context context = getContext();
+        if (context instanceof Activity) {
+            Activity act = (Activity) context;
+            if(act.isFinishing()) return;
+        }
+        super.show();
     }
 }

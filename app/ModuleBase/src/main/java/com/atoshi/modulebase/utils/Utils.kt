@@ -18,7 +18,7 @@ fun Activity.startPath(path: String){
     startActivity(Intent(this, Class.forName(path)))
 }
 
-inline fun <reified T: Activity> Activity.startPath(){
+inline fun <reified T: Activity> Activity.start(){
     startActivity(Intent(this, T::class.java))
 }
 inline fun <reified T: Activity> Activity.startFinish(){

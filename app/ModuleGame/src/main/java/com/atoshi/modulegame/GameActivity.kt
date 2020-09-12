@@ -6,8 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Build
 import android.view.KeyEvent
 import android.view.ViewGroup
@@ -15,6 +15,7 @@ import android.webkit.WebView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.atoshi.moduleads.TopOnHelper
+import com.atoshi.moduleads.TopOnTestActivity
 import com.atoshi.modulebase.base.BaseActivity
 import com.atoshi.modulebase.net.Api
 import com.atoshi.modulebase.net.model.*
@@ -35,7 +36,7 @@ const val ACTION_PRELOAD_ADS = "action_preload_ads"
 
 class GameActivity : BaseActivity(), IWxApi, IApiForGame {
     companion object{
-        var BASE_URL_GAME = if(BuildConfig.IS_DEBUG) "http://game.lbtb.org.cn" else "http://game.atoshi.mobi/other/android"
+        var BASE_URL_GAME = if(!BuildConfig.IS_DEBUG) "http://game.lbtb.org.cn" else "http://game.atoshi.mobi/other/android"
     }
     init {
         FULL_SCREEN = true
@@ -77,7 +78,7 @@ class GameActivity : BaseActivity(), IWxApi, IApiForGame {
     // TODO: by HY, 2020/7/23 声明周期， 在Activity生成但未显示的时候跳转：有没有更早的？
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        // TODO: by HY, 2020/7/23 过渡动画
+
         startPath("com.atoshi.games.SplashActivity")
     }
 
@@ -122,7 +123,6 @@ class GameActivity : BaseActivity(), IWxApi, IApiForGame {
         return super.onKeyDown(keyCode, event)
     }
 
-    // TODO: by HY, 2020/7/23 界面初始化：卡在哪些时间了？如何检测？如果有初始化放在哪里合适？
     override fun initView() {
         println("---------------------------------initView")
 
@@ -130,7 +130,13 @@ class GameActivity : BaseActivity(), IWxApi, IApiForGame {
             if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 WebView.setWebContentsDebuggingEnabled(true);
             }
-            mWebView = WebView(this@GameActivity).apply {
+            var context = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                && Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                this@GameActivity.createConfigurationContext(Configuration())
+            } else {
+                this@GameActivity
+            }
+            mWebView = WebView(context).apply {
                 layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
@@ -138,13 +144,12 @@ class GameActivity : BaseActivity(), IWxApi, IApiForGame {
                 settings.javaScriptEnabled = true
                 webViewClient = GameWebviewClient()
                 addJavascriptInterface(JsInterface(this@GameActivity, topOnCallback), "AtoshiGame")
+                loadUrl()
             }
             setContentView(mWebView)
-            // TODO: yang 2020/8/20 即使已经pageFinish了，显示出来该页面时还是空白（空白就是finish了，只是游戏加载是另一个过程？）
             loadUrl()
         }, 500)
 
-        // TODO: yang 2020/8/20 封装延迟操作、倒计时
         window.decorView.postDelayed({
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ActivityCompat.checkSelfPermission(

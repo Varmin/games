@@ -67,14 +67,29 @@ public class PosterHelper {
             long drawStart = SystemClock.currentThreadTimeMillis();
             Bitmap newBitmap = drawBitmap(bgBitmap, headerBitmap, QRCBitmap, mCodeStr, mIntroStr);
             System.out.println("PosterHelper.onCreate， drawTims = "+ (SystemClock.currentThreadTimeMillis() - drawStart));
-            new Handler(Looper.getMainLooper()).post(()->{
-                mCallback.success(newBitmap);
-            });
+            success(newBitmap);
         }).start();
     }
 
+    private void success(Bitmap bitmap){
+        new Handler(Looper.getMainLooper()).post(()->{
+            if (bitmap != null) {
+                mCallback.success(bitmap);
+            }else {
+                mCallback.failed("图片生成失败");
+            }
+        });
+    }
+    private void failed(String msg){
+        new Handler(Looper.getMainLooper()).post(()->{
+            mCallback.failed(msg);
+        });
+    }
+
     private Bitmap drawBitmap(Bitmap backgroundBitmap, Bitmap headerBitmap, Bitmap qrcBitmap, String codeStr, String introStr) {
-        // TODO: yang 2020/9/9 null
+        if (backgroundBitmap == null || qrcBitmap == null) {
+            return null;
+        }
         Bitmap bgBitmap = backgroundBitmap.copy(backgroundBitmap.getConfig(), true);
         Canvas canvas = new Canvas(bgBitmap);
         int width = canvas.getWidth();
@@ -102,7 +117,8 @@ public class PosterHelper {
         disHeaderRectF.top = bgBotRect.top + bgBotRect.left*3 + Math.abs(codeRect.top);
         disHeaderRectF.bottom = bgBotRect.bottom - bgBotRect.left;
         disHeaderRectF.right = disHeaderRectF.left + (disHeaderRectF.bottom - disHeaderRectF.top);
-        canvas.drawBitmap(headerBitmap, null, disHeaderRectF, paint);
+        if (headerBitmap != null) canvas.drawBitmap(headerBitmap, null, disHeaderRectF, paint);
+
         //二维码
         RectF disCodeRectF = new RectF();
         disCodeRectF.top = bgBotRect.top + bgBotRect.left;
@@ -144,7 +160,7 @@ public class PosterHelper {
 
 
         if(!backgroundBitmap.isRecycled()) backgroundBitmap.recycle();
-        if(!headerBitmap.isRecycled()) headerBitmap.recycle();
+        if(headerBitmap != null && !headerBitmap.isRecycled()) headerBitmap.recycle();
         if(!qrcBitmap.isRecycled()) qrcBitmap.recycle();
         System.out.println("PosterHelper.drawBitmap: isRecycled="+bgBitmap.isRecycled());
         return bgBitmap;
@@ -177,12 +193,12 @@ public class PosterHelper {
                 return retBitmap;
             }else {
                 System.out.println("PosterHelper.getBitmap, 获取图片失败："+httpURLConnection.getResponseCode());
-                mCallback.failed("获取图片失败："+httpURLConnection.getResponseCode());
+                failed("获取图片失败："+httpURLConnection.getResponseCode());
             }
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("PosterHelper.getBitmap: e="+e.toString());
-            mCallback.failed(e.toString());
+            failed(e.toString());
         }finally {
             System.out.println("PosterHelper.getBitmap: finally");
             try {
