@@ -64,6 +64,10 @@ class GameActivity : BaseActivity(), IWxApi, IApiForGame {
     }
 
     var topOnCallback = object : TopOnHelper.ListenerCallback {
+        override fun start(placementId: String) {
+            runOnUiThread { adsShowStart(placementId) }
+        }
+
         override fun success() {
             println("topOnCallback.success")
             runOnUiThread { adsShowSuccess() }
@@ -74,6 +78,8 @@ class GameActivity : BaseActivity(), IWxApi, IApiForGame {
             runOnUiThread { adsShowError("$placementId, $error") }
         }
     }
+
+
 
     // TODO: by HY, 2020/7/23 声明周期， 在Activity生成但未显示的时候跳转：有没有更早的？
     override fun onAttachedToWindow() {
@@ -176,10 +182,13 @@ class GameActivity : BaseActivity(), IWxApi, IApiForGame {
 //        mWebView?.loadUrl("https://www.baidu.com")
     }
 
+    private fun adsShowStart(placementId: String) {
+        mWebView?.loadUrl("javascript:adsShowStart('${placementId}')")
+    }
+
     private fun adsShowSuccess() {
         mWebView?.loadUrl("javascript:adsShowSuccess()")
     }
-
     private fun adsShowError(errMsg: String) {
         mWebView?.loadUrl("javascript:adsShowError()")
         mWebView?.loadUrl("javascript:adsShowError('$errMsg')")

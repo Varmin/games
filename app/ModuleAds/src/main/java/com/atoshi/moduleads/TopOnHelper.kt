@@ -124,6 +124,7 @@ object TopOnHelper {
 
     //----------------------------------------Listener----------------------------------------
     interface ListenerCallback {
+        fun start(placementId: String)
         fun success()
         fun error(placementId: String, error: String)
     }
@@ -293,6 +294,7 @@ object TopOnHelper {
             println("TopOnRewardListener.onRewardedVideoAdPlayStart: $p0")
             //在此回调中调用load进行广告的加载，方便下一次广告的展示
             mRewardMap[placementId]?.load()
+            callback?.start(placementId)
         }
 
         override fun onRewardedVideoAdFailed(p0: AdError?) {
