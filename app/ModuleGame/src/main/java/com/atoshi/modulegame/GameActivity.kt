@@ -15,7 +15,6 @@ import android.webkit.WebView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.atoshi.moduleads.TopOnHelper
-import com.atoshi.moduleads.TopOnTestActivity
 import com.atoshi.modulebase.base.BaseActivity
 import com.atoshi.modulebase.net.Api
 import com.atoshi.modulebase.net.model.*
@@ -34,7 +33,7 @@ import org.json.JSONObject
 const val ACTION_LOAD_URL = "action_load_url"
 const val ACTION_PRELOAD_ADS = "action_preload_ads"
 
-class GameActivity : BaseActivity(), IWxApi, IApiForGame {
+class GameActivity : BaseActivity(), IWxApi, IGameView {
     companion object{
         var BASE_URL_GAME = if(!BuildConfig.IS_DEBUG) "http://game.lbtb.org.cn" else "http://game.atoshi.mobi/other/android"
     }
@@ -42,6 +41,8 @@ class GameActivity : BaseActivity(), IWxApi, IApiForGame {
         FULL_SCREEN = true
     }
 
+    //是否在“其它游戏界面”：0不在，1在
+    private var mOtherGamesStatus: Int = 0
     private var mWebView: WebView? = null
     private var mUpdateReceiver: WxLoginReceiver? = null
 
@@ -54,7 +55,7 @@ class GameActivity : BaseActivity(), IWxApi, IApiForGame {
     inner class ReceiverReload : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.run {
-                if (action == ACTION_LOAD_URL) loadUrl(true)
+                if (action == ACTION_LOAD_URL) loadGameUrl(true)
                 if (action == ACTION_PRELOAD_ADS) {
                     TopOnHelper.intersShow(this@GameActivity, 0, true, topOnCallback)
                     TopOnHelper.rewardShow(this@GameActivity, 0, true, topOnCallback)
@@ -105,6 +106,10 @@ class GameActivity : BaseActivity(), IWxApi, IApiForGame {
     override fun onResume() {
         super.onResume()
         UpdateManager(this).checkVersion()
+        if(mOtherGamesStatus == 1) updateGameStatistics()
+    }
+    override fun othersGames(status: Int) {
+        this.mOtherGamesStatus = status
     }
 
     override fun onDestroy() {
@@ -150,10 +155,10 @@ class GameActivity : BaseActivity(), IWxApi, IApiForGame {
                 settings.javaScriptEnabled = true
                 webViewClient = GameWebviewClient()
                 addJavascriptInterface(JsInterface(this@GameActivity, topOnCallback), "AtoshiGame")
-                loadUrl()
+                loadGameUrl()
             }
             setContentView(mWebView)
-            loadUrl()
+            loadGameUrl()
         }, 500)
 
         window.decorView.postDelayed({
@@ -174,39 +179,52 @@ class GameActivity : BaseActivity(), IWxApi, IApiForGame {
     }
 
     // TODO: by HY, 2020/7/24 WebView优化：缓存、预加载...
-    private fun loadUrl(reload: Boolean = false) {
+    private fun loadGameUrl(reload: Boolean = false) {
         val openId = SPTool.getString(WXUtils.WX_OPEN_ID)
         val token = SPTool.getString(WXUtils.APP_USER_TOKEN)
         val tag = if (reload) "&reload=true" else ""
-        mWebView?.loadUrl("$BASE_URL_GAME?openid=$openId&token=$token$tag")
-//        mWebView?.loadUrl("https://www.baidu.com")
+//        loadUrl("https://www.baidu.com")
+        loadUrl("$BASE_URL_GAME?openid=$openId&token=$token$tag")
     }
 
+    private fun loadUrl(url: String){
+        println("GameActivity.loadUrl: $url")
+        mWebView?.loadUrl(url)
+    }
+
+
+
     private fun adsShowStart(placementId: String) {
-        mWebView?.loadUrl("javascript:adsShowStart('${placementId}')")
+        loadUrl("javascript:adsShowStart('${placementId}')")
     }
 
     private fun adsShowSuccess() {
-        mWebView?.loadUrl("javascript:adsShowSuccess()")
+        loadUrl("javascript:adsShowSuccess()")
     }
     private fun adsShowError(errMsg: String) {
-        mWebView?.loadUrl("javascript:adsShowError()")
-        mWebView?.loadUrl("javascript:adsShowError('$errMsg')")
+        //loadUrl("javascript:adsShowError()")
+        loadUrl("javascript:adsShowError('$errMsg')")
     }
 
     /**
      * 更新信息
      */
     private fun loadUpdate(nickname: String, headimgurl: String) {
-        println("GameActivity.loadUpdate：javascript:updateInfo('$nickname', '$headimgurl')")
-        mWebView?.loadUrl("javascript:updateInfo('$nickname', '$headimgurl')")
+        loadUrl("javascript:updateInfo('$nickname', '$headimgurl')")
     }
 
     /**
      * 更新token
      */
     fun updateToken(token: String){
-        mWebView?.loadUrl("javascript:updateToken('$token')")
+        loadUrl("javascript:updateToken('$token')")
+    }
+
+    /**
+     * 在“其它游戏”界面，更新统计信息
+     */
+    private fun updateGameStatistics(){
+        loadUrl("javascript:updateGameStatistics()")
     }
 
     // TODO: yang 2020/8/10 整理

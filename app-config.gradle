@@ -1,12 +1,12 @@
 ext{
 
-    IS_DEBUG = false
+    IS_DEBUG = true
 
     IS_APPLICATION = false
 
     configAndroid = [
-            versionCode : 123,
-            versionName : "1.2.3",
+            versionCode : 124,
+            versionName : "1.2.4",
             minSdkVersion    : 16,
             targetSdkVersion : 29,
             compileSdkVersion : 29,
