@@ -58,6 +58,8 @@ class SplashActivity : BaseActivity() {
     fun loadSplashAd(){
         // todo 5s强制跳转
         TopOnHelper.splashAds(flAdsContainer, object : TopOnHelper.ListenerCallback {
+            override fun start(placementId: String) {}
+
             override fun success() {
                 println("SplashActivity.success")
                 if(!isFinishing) checkLogin()

@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
  * description:
  */
 object Api{
-    var BASE_URL_API = if(!BuildConfig.IS_DEBUG) "http://game.lbtb.org.cn/game/gamebox/" else "http://47.93.219.181:9599/game/gamebox/"
+    var BASE_URL_API = if(!BuildConfig.IS_DEBUG) "http://game.lbtb.org.cn/game/gamebox/" else "http://game-test.lbtb.org.cn/game/gamebox/"
 
     val service: ApiService
     init {
